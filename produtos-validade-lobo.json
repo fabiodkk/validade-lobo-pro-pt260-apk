@@ -1,0 +1,49 @@
+{
+  "version": 1,
+  "products": [
+    "Pao frances",
+    "Pao de sal",
+    "Pao de leite",
+    "Pao integral",
+    "Pao de forma",
+    "Pao de queijo",
+    "Pao doce",
+    "Bisnaga",
+    "Sonho",
+    "Rosca",
+    "Bolo simples",
+    "Bolo de chocolate",
+    "Salgado assado"
+  ],
+  "rules": [
+    {
+      "match": "*",
+      "validityDays": 5,
+      "startLabel": "Fab",
+      "validityLabel": "Val"
+    }
+  ]
+}{
+  "version": 1,
+  "rules": [
+    { "match": "pao", "validityHours": 24, "startLabel": "Fabricado" },
+    { "match": "pao frances", "validityHours": 24, "startLabel": "Fabricado" },
+    { "match": "pao de queijo", "validityHours": 24, "startLabel": "Fabricado" },
+    { "match": "bolo", "validityDays": 5, "startLabel": "Fabricado" },
+    { "match": "salgado", "validityHours": 6, "startLabel": "Pronto" },
+    { "match": "pizza", "validityDays": 5, "startLabel": "Fabricado" }
+  ],
+  "products": [
+    "Pao frances",
+    "Pao de queijo",
+    "Pao integral",
+    "Pao doce",
+    "Pao de milho",
+    "Bolo simples",
+    "Bolo recheado",
+    "Salgados",
+    "Pizza",
+    "Mousse",
+    "Pudim"
+  ]
+}
