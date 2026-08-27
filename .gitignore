@@ -2,5 +2,6 @@
 !.gitignore
 !README.md
 !update.json
+!produtos-validade-lobo.json
 !releases/
 !releases/ValidadeLoboPro.apk
