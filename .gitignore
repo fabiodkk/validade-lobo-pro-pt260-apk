@@ -1,11 +1,6 @@
-.gradle/
-.idea/
-build/
-app/build/
-local.properties
-keystore.properties
-.env
-*.jks
-*.keystore
-hs_err_pid*.log
-replay_pid*.log
+*
+!.gitignore
+!README.md
+!update.json
+!releases/
+!releases/ValidadeLoboPro.apk

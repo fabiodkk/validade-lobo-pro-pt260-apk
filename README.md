@@ -1,15 +1,8 @@
-# Validade Lobo Pro PT260
+# Validade Lobo Pro PT260 APK
 
-Aplicativo Android Pro do Validade PT260, mantido em um repositorio separado.
+Repositorio publico para distribuir o APK do Validade Lobo Pro PT260.
 
-Este projeto nao deve compartilhar tabelas, migrations, credenciais ou artefatos com o app Validade PT260. Os dados do Lobo Pro usam o namespace `lobo_pro` no Supabase.
+- APK mais recente: https://github.com/fabiodkk/validade-lobo-pro-pt260-apk/releases/latest/download/ValidadeLoboPro.apk
+- Metadados de atualizacao: https://raw.githubusercontent.com/fabiodkk/validade-lobo-pro-pt260-apk/master/update.json
 
-## Seguranca
-
-- Nunca versionar `.env`, chaves privadas, senhas ou arquivos de assinatura.
-- Usar apenas a chave anon/publica no aplicativo Android.
-- Chaves de servico devem ficar somente no backend ou nas Edge Functions do Supabase.
-
-## Banco de dados
-
-As migrations do Lobo Pro ficam em `supabase/migrations` e usam tabelas e funcoes com prefixo `lobo_pro_`, evitando conflito com as tabelas do Validade PT260.
+O aplicativo consulta `update.json` para verificar novas versoes.
