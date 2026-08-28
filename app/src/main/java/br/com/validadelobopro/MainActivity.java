@@ -485,6 +485,7 @@ public class MainActivity extends Activity implements LifecycleOwner {
     private final List<String> produtos = new ArrayList<>();
     private final List<ValidityRule> rules = new ArrayList<>();
     private volatile boolean printSyncRunning = false;
+    private volatile boolean padariaHistorySyncRunning = false;
 
     private void loadEnvProperties() {
         try {
@@ -557,6 +558,7 @@ public class MainActivity extends Activity implements LifecycleOwner {
         refreshSupabaseConfigAsync();
         syncDeviceRegistrationAsync();
         syncPendingPrintHistoryAsync();
+        syncPadariaHistoryAsync();
     }
 
     @Override
@@ -568,6 +570,7 @@ public class MainActivity extends Activity implements LifecycleOwner {
         }
         maybeShowExpiryReminder(false);
         syncPendingPrintHistoryAsync();
+        syncPadariaHistoryAsync();
         if (ocrPage != null && ocrPage.getVisibility() == View.VISIBLE) {
             startOcrCameraIfReady();
         }
@@ -3529,6 +3532,7 @@ public class MainActivity extends Activity implements LifecycleOwner {
                     Log.i(TAG, "Configuracao Supabase remota carregada.");
                     syncDeviceRegistrationAsync();
                     syncPendingPrintHistoryAsync();
+                    syncPadariaHistoryAsync();
                 }
             } catch (Exception e) {
                 Log.w(TAG, "Nao foi possivel carregar configuracao Supabase remota", e);
@@ -3606,25 +3610,59 @@ public class MainActivity extends Activity implements LifecycleOwner {
         }
         new Thread(() -> {
             try {
-                JSONObject payload = buildBaseTrackingPayload();
-                payload.put("client_event_id", sha256(installationId() + "|padaria|" + entry.lot + "|" + entry.printedAt));
-                payload.put("printed_at_ms", entry.printedAt);
-                payload.put("product", entry.product);
-                payload.put("copies", entry.copies);
-                payload.put("expiry_at_ms", entry.expiryAt);
-                payload.put("source", "android_padaria_lote");
-                payload.put("company_name", currentEstablishmentName());
-                JSONObject metadata = new JSONObject();
-                metadata.put("lote", entry.lot);
-                metadata.put("peso_kg", entry.weightKg);
-                metadata.put("origem", currentPadariaAddress());
-                metadata.put("tipo", "padaria");
-                payload.put("metadata", metadata);
-                postSupabaseRpc(SUPABASE_RPC_RECORD_PRINT, payload);
+                postSupabaseRpc(SUPABASE_RPC_RECORD_PRINT, buildPadariaLotPayload(entry));
                 runOnUiThread(() -> setStatus("Lote " + entry.lot + " salvo na nuvem."));
             } catch (Exception e) {
                 Log.w(TAG, "Falha ao sincronizar lote da padaria no Supabase", e);
                 runOnUiThread(() -> setStatus("Lote salvo no aparelho; nuvem pendente."));
+            }
+        }).start();
+    }
+
+    private JSONObject buildPadariaLotPayload(PeixariaEntry entry) throws JSONException {
+        JSONObject payload = buildBaseTrackingPayload();
+        payload.put("client_event_id", sha256(installationId() + "|padaria|" + entry.lot + "|" + entry.printedAt));
+        payload.put("printed_at_ms", entry.printedAt);
+        payload.put("product", entry.product);
+        payload.put("copies", entry.copies);
+        payload.put("expiry_at_ms", entry.expiryAt);
+        payload.put("source", "android_padaria_lote");
+        payload.put("company_name", currentEstablishmentName());
+        JSONObject metadata = new JSONObject();
+        metadata.put("lote", entry.lot);
+        metadata.put("peso_kg", entry.weightKg);
+        metadata.put("origem", currentPadariaAddress());
+        metadata.put("tipo", "padaria");
+        payload.put("metadata", metadata);
+        return payload;
+    }
+
+    private void syncPadariaHistoryAsync() {
+        if (padariaHistorySyncRunning || !isSupabaseConfigured()) {
+            return;
+        }
+        List<PeixariaEntry> snapshot = loadPeixariaHistory();
+        if (snapshot.isEmpty()) {
+            return;
+        }
+        padariaHistorySyncRunning = true;
+        new Thread(() -> {
+            int synced = 0;
+            try {
+                for (PeixariaEntry entry : snapshot) {
+                    try {
+                        postSupabaseRpc(SUPABASE_RPC_RECORD_PRINT, buildPadariaLotPayload(entry));
+                        synced++;
+                    } catch (Exception e) {
+                        Log.w(TAG, "Falha ao recuperar lote local " + entry.lot, e);
+                    }
+                }
+                if (synced > 0) {
+                    int total = synced;
+                    runOnUiThread(() -> setStatus(total + " lote(s) local(is) enviados para a nuvem."));
+                }
+            } finally {
+                padariaHistorySyncRunning = false;
             }
         }).start();
     }

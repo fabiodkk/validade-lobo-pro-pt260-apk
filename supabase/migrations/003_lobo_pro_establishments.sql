@@ -19,9 +19,9 @@ alter table public.lobo_pro_check_history
 
 insert into public.lobo_pro_establishments (slug, display_name, address, access_password_hash)
 values
-    ('padaria-lobo', 'Padaria Lobo', 'Av. Mal. Floriano Peixoto, 260 - Poiares, Caraguatatuba - SP, 11673-000', crypt('lobopt260', gen_salt('bf'))),
-    ('peixaria', 'Peixaria', null, crypt('pt260', gen_salt('bf'))),
-    ('peixeiro', 'Peixeiro', null, crypt('pt260', gen_salt('bf')))
+    ('padaria-lobo', 'Padaria Lobo', 'Av. Mal. Floriano Peixoto, 260 - Poiares, Caraguatatuba - SP, 11673-000', extensions.crypt('lobopt260', extensions.gen_salt('bf'))),
+    ('peixaria', 'Peixaria', null, extensions.crypt('pt260', extensions.gen_salt('bf'))),
+    ('peixeiro', 'Peixeiro', null, extensions.crypt('pt260', extensions.gen_salt('bf')))
 on conflict (slug) do nothing;
 
 create index if not exists lobo_pro_print_establishment_idx
@@ -51,7 +51,7 @@ begin
         raise exception 'invalid establishment name';
     end if;
     insert into public.lobo_pro_establishments (slug, display_name, address, access_password_hash)
-    values (establishment_slug, establishment_name, nullif(trim(payload->>'address'), ''), crypt(establishment_password, gen_salt('bf')))
+    values (establishment_slug, establishment_name, nullif(trim(payload->>'address'), ''), extensions.crypt(establishment_password, extensions.gen_salt('bf')))
     returning * into created_establishment;
     return jsonb_build_object('id', created_establishment.id, 'slug', created_establishment.slug, 'display_name', created_establishment.display_name);
 exception
@@ -66,7 +66,7 @@ select id
 from public.lobo_pro_establishments
 where active
   and slug = lower(trim(payload->>'establishment_slug'))
-  and access_password_hash = crypt(payload->>'establishment_password', access_password_hash)
+    and access_password_hash = extensions.crypt(payload->>'establishment_password', access_password_hash)
 limit 1;
 $$;
 

@@ -28,8 +28,8 @@ android {
         applicationId "br.com.validadelobopro"
         minSdk 23
         targetSdk 36
-        versionCode 44
-        versionName "1.22.1"
+        versionCode 45
+        versionName "1.22.2"
 
         buildConfigField "String", "SUPABASE_URL", "\"${javaString(supabaseProperties.getProperty("SUPABASE_URL", ""))}\""
         buildConfigField "String", "SUPABASE_ANON_KEY", "\"${javaString(supabaseProperties.getProperty("SUPABASE_ANON_KEY", ""))}\""
