@@ -1,7 +1,8 @@
 {
-  "latestVersionCode": 45,
-  "latestVersionName": "1.22.2",
-  "apkUrl": "https://github.com/fabiodkk/validade-lobo-pro-pt260-apk/releases/download/v1.22.2/ValidadeLoboPro.apk",
-  "releasePageUrl": "https://github.com/fabiodkk/validade-lobo-pro-pt260-apk/releases/tag/v1.22.2",
-  "notes": "Versao Pro baseada no Validade PT260, com camera, OCR, catalogo, impressao PT260/XD210 e historico."
+  "latestVersionCode": 47,
+  "latestVersionName": "1.22.4",
+  "apkUrl": "https://github.com/fabiodkk/validade-lobo-pro-pt260-apk/releases/download/v1.22.4/Validade-PT260-GitHub-1.22.4.apk",
+  "releasePageUrl": "https://github.com/fabiodkk/validade-lobo-pro-pt260-apk/releases/tag/v1.22.4",
+  "mandatoryAfter": "2026-09-28T00:00:00-03:00",
+  "notes": "Atualizacao oficial: Validade gratuita preservada, integracao empresarial protegida e correcoes de OCR, lotes e impressao."
 }

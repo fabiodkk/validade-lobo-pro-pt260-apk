@@ -72,7 +72,12 @@ import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.LifecycleRegistry;
 
+import com.google.android.gms.tasks.Tasks;
 import com.google.common.util.concurrent.ListenableFuture;
+import com.google.mlkit.vision.barcode.BarcodeScanner;
+import com.google.mlkit.vision.barcode.BarcodeScannerOptions;
+import com.google.mlkit.vision.barcode.BarcodeScanning;
+import com.google.mlkit.vision.barcode.common.Barcode;
 import com.google.mlkit.vision.common.InputImage;
 import com.google.mlkit.vision.text.Text;
 import com.google.mlkit.vision.text.TextRecognition;
@@ -135,14 +140,21 @@ public class MainActivity extends Activity implements LifecycleOwner {
     private static final String PREF_PRINTER_SETTINGS_BACKUP_JSON = "printer_settings_backup_json";
     private static final String PREF_PRINTER_FAILURE_COUNT = "printer_failure_count";
     private static final String PREF_BETA_UNLOCKED = "beta_unlocked";
+    private static final String PREF_BETA_USER_NAME = "beta_user_name";
+    private static final String PREF_BETA_USER_PHONE = "beta_user_phone";
+    private static final String PREF_BETA_LOGIN_MODE = "beta_login_mode";
+    private static final String PREF_BETA_CUSTOM_PASSWORD = "beta_custom_password";
+    private static final String PREF_BETA_TEST_MODE = "beta_test_mode";
     private static final String PREF_MAIN_PAGE = "main_page";
-    private static final String PREF_PEIXARIA_LOTE_SEQUENCE = "padaria_lote_sequence";
-    private static final String PREF_PEIXARIA_LOTE_YEAR = "padaria_lote_year";
-    private static final String PREF_PEIXARIA_HISTORY_JSON = "padaria_history_json";
-    private static final String PREF_PADARIA_ADDRESS = "padaria_address";
+    private static final String PREF_INTEGRATION_ENTITLEMENT_UNTIL = "integration_entitlement_until";
+    private static final String PREF_RELEASE_NOTICE_VERSION = "release_notice_version";
+    private static final String PREF_PEIXARIA_LOTE_SEQUENCE = "lote_sequence";
+    private static final String PREF_PEIXARIA_LOTE_YEAR = "lote_year";
+    private static final String PREF_PEIXARIA_HISTORY_JSON = "lote_history_json";
+    private static final String PREF_PADARIA_ADDRESS = "lote_origin_address";
     private static final String PREF_ESTABLISHMENT_NAME = "establishment_name";
     private static final String DEFAULT_PADARIA_ADDRESS = "Av. Mal. Floriano Peixoto, 260 - Poiares, Caraguatatuba - SP, 11673-000";
-    private static final String PEIXARIA_CATALOG_FILE = "produtos-rastreabilidade-padaria.json";
+    private static final String PEIXARIA_CATALOG_FILE = "produtos-rastreabilidade-lotes.json";
     private static final String PREF_PRINT_HISTORY_JSON = "print_history_json";
     private static final String PREF_PENDING_PRINT_SYNC_JSON = "pending_print_sync_json";
     private static final String PREF_OCR_ALERTS_JSON = "ocr_alerts_json";
@@ -158,12 +170,15 @@ public class MainActivity extends Activity implements LifecycleOwner {
     private static final String SUPABASE_RPC_RECORD_CHECK = "lobo_pro_record_check";
     private static final String SUPABASE_RPC_CLOUD_DASHBOARD = "lobo_pro_cloud_dashboard";
     private static final String SUPABASE_RPC_CREATE_ESTABLISHMENT = "lobo_pro_create_establishment";
+    private static final String SUPABASE_RPC_REGISTER_BETA_ACCESS = "lobo_pro_register_beta_access";
+    private static final String SUPABASE_RPC_NOTIFY_BETA_ACCESS = "lobo_pro_notify_beta_access";
+    private static final String SUPABASE_RPC_CREATE_CORA_CHECKOUT = "lobo_pro_create_cora_checkout";
     private static final String BETA_LOGIN = "lobo";
     private static final String BETA_PASSWORD = "lobopt260";
     private static final String LEGACY_BETA_LOGIN = "beta";
     private static final String LEGACY_BETA_PASSWORD = "pt260";
     private static final String MAIN_PAGE_VALIDITY = "validity";
-    private static final String MAIN_PAGE_PEIXARIA = "padaria";
+    private static final String MAIN_PAGE_PEIXARIA = "lotes";
     private static final int MAX_PEIXARIA_HISTORY = 500;
     private static final String DEFAULT_CATALOG_URL = "https://raw.githubusercontent.com/fabiodkk/validade-lobo-pro-pt260-apk/master/produtos-validade-lobo.json";
     private static final String UPDATE_INFO_URL = "https://raw.githubusercontent.com/fabiodkk/validade-lobo-pro-pt260-apk/master/update.json";
@@ -183,6 +198,7 @@ public class MainActivity extends Activity implements LifecycleOwner {
     private static final int PRINT_ALERT_THRESHOLD = 10;
     private static final int MAX_PRINT_HISTORY = 250;
     private static final int MAX_OCR_ALERTS = 250;
+    private static final int MAX_TEXT_ONLY_LINE_CHARS = 11;
     private static final long OCR_SCAN_INTERVAL_MS = 900;
     private static final long OCR_DUPLICATE_INTERVAL_MS = 8000;
     private static final long SUPABASE_CONFIG_REFRESH_INTERVAL_MS = 10 * 60 * 1000;
@@ -217,6 +233,8 @@ public class MainActivity extends Activity implements LifecycleOwner {
             "Enroladinho de salsicha",
             "Pastel assado",
             "Mousse morango",
+            "Morangos do amor",
+            "Morango cravejado",
             "Mousse goiaba",
             "Pudim",
             "Mousse ninho",
@@ -316,6 +334,8 @@ public class MainActivity extends Activity implements LifecycleOwner {
             new ValidityRule("enroladinho", 0, 6, "Pronto"),
             new ValidityRule("pastel", 0, 6, "Pronto"),
             new ValidityRule("croquete", 0, 6, "Pronto"),
+            new ValidityRule("morangos do amor", 5, 0, "Fab"),
+            new ValidityRule("morango cravejado", 5, 0, "Fab"),
             new ValidityRule("*", 5, 0, "Fab")
     );
 
@@ -373,6 +393,8 @@ public class MainActivity extends Activity implements LifecycleOwner {
     private TextView cloudRecentChecksText;
     private TextView ocrStatusText;
     private TextView ocrResultText;
+    private EditText wineCaptionEdit;
+    private Bitmap winePhotoBitmap;
     // transient override used to prefer a specific printer model for the current print
     // This is set when we detect a known device (e.g. PT-260_7D0C) and cleared after the
     // print operation so global settings are not changed.
@@ -466,6 +488,7 @@ public class MainActivity extends Activity implements LifecycleOwner {
     private final LifecycleRegistry lifecycleRegistry = new LifecycleRegistry(this);
     private ExecutorService ocrExecutor;
     private TextRecognizer textRecognizer;
+    private BarcodeScanner barcodeScanner;
     private ProcessCameraProvider cameraProvider;
     private ToneGenerator ocrTone;
     private boolean ocrUseFrontCamera = true;
@@ -546,6 +569,7 @@ public class MainActivity extends Activity implements LifecycleOwner {
         produtos.addAll(categoriasMap.containsKey("Todos") ? categoriasMap.get("Todos") : todosProdutos);
         rules.addAll(catalog.rules);
         buildLayout();
+        maybeShowOfficialReleaseNotice();
         savePrinterSettingsBackup();
         CatalogSyncJobService.schedule(this);
         registerScreenReminderReceiver();
@@ -594,6 +618,10 @@ public class MainActivity extends Activity implements LifecycleOwner {
             textRecognizer.close();
             textRecognizer = null;
         }
+        if (barcodeScanner != null) {
+            barcodeScanner.close();
+            barcodeScanner = null;
+        }
         if (ocrTone != null) {
             ocrTone.release();
             ocrTone = null;
@@ -638,7 +666,7 @@ public class MainActivity extends Activity implements LifecycleOwner {
         titleBox.setOrientation(LinearLayout.VERTICAL);
 
         var title = new TextView(this);
-        title.setText("Validade Pro");
+        title.setText("Validade PT260");
         title.setTextSize(TypedValue.COMPLEX_UNIT_SP, 24);
         title.setTextColor(COLOR_TEXT);
         title.setTypeface(Typeface.DEFAULT_BOLD);
@@ -1063,7 +1091,7 @@ public class MainActivity extends Activity implements LifecycleOwner {
         aboutAppEdit = new EditText(this);
         aboutAppEdit.setSingleLine(true);
         aboutAppEdit.setFocusable(false);
-        aboutAppEdit.setText("Validade Pro " + BuildConfig.VERSION_NAME);
+        aboutAppEdit.setText("Validade PT260 " + BuildConfig.VERSION_NAME);
         aboutAppEdit.setOnClickListener(v -> showAboutDialog());
         aboutAppEdit.setOnLongClickListener(v -> {
             showBetaLoginDialog();
@@ -1100,7 +1128,7 @@ public class MainActivity extends Activity implements LifecycleOwner {
 
         polishTree(root);
         setContentView(scroll);
-        showPage(isPeixariaMainPage() && isBetaUnlocked() ? MAIN_PAGE_PEIXARIA : MAIN_PAGE_VALIDITY);
+        showPage(isPeixariaMainPage() ? MAIN_PAGE_PEIXARIA : MAIN_PAGE_VALIDITY);
     }
 
     private void buildTextOnlyPage() {
@@ -1286,8 +1314,7 @@ public class MainActivity extends Activity implements LifecycleOwner {
         addMoreRow("Avisos", "alerts", "Historico", "history");
         addMoreRow("So Precos", "only_prices", "So texto", "text_only");
         addMoreRow("So imagem", "image_only", "Ajustes", "settings");
-        addMoreRow("OCR", "ocr", "Beta", "beta");
-        addMoreRow("Padaria", "padaria", "Painel Padaria", "padaria_panel");
+        addMoreRow("OCR vinho", "ocr", "Beta", "beta");
 
         morePage.addView(morePageActionButton("Adicionar produto ao catalogo", v -> showAddPeixariaProductDialog()), withBottomMargin(fullWidth(dp(56)), dp(8)));
         morePage.addView(morePageActionButton("Mudar Local", v -> showPage("settings")), withBottomMargin(fullWidth(dp(56)), dp(8)));
@@ -1336,7 +1363,7 @@ public class MainActivity extends Activity implements LifecycleOwner {
 
     private void buildOcrPage() {
         var title = new TextView(this);
-        title.setText("OCR validade");
+        title.setText("OCR de vinho e lote");
         title.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18);
         title.setTextColor(COLOR_TEXT);
         title.setTypeface(Typeface.DEFAULT_BOLD);
@@ -1344,7 +1371,7 @@ public class MainActivity extends Activity implements LifecycleOwner {
         ocrPage.addView(title, fullWidth(-2));
 
         var version = new TextView(this);
-        version.setText("Beta OCR - Versao " + BuildConfig.VERSION_NAME);
+        version.setText("Reconhecimento local no aparelho - Versao " + BuildConfig.VERSION_NAME);
         version.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
         version.setTextColor(COLOR_MUTED);
         version.setPadding(0, 0, 0, dp(8));
@@ -1371,6 +1398,27 @@ public class MainActivity extends Activity implements LifecycleOwner {
         ocrResultText.setPadding(dp(12), dp(10), dp(12), dp(10));
         ocrResultText.setBackground(rounded(COLOR_SURFACE, 10, COLOR_BORDER, 1));
         ocrPage.addView(ocrResultText, withBottomMargin(fullWidth(-2), dp(8)));
+
+        wineCaptionEdit = new EditText(this);
+        wineCaptionEdit.setSingleLine(true);
+        wineCaptionEdit.setHint("Legenda: vinho branco chileno ou portugues");
+        ocrPage.addView(field("Legenda do vinho", wineCaptionEdit), fullWidth(-2));
+
+        var wineActions = new LinearLayout(this);
+        wineActions.setOrientation(LinearLayout.HORIZONTAL);
+        wineActions.setGravity(Gravity.CENTER_VERTICAL);
+
+        var captureWineButton = new Button(this);
+        captureWineButton.setText("Capturar foto");
+        captureWineButton.setOnClickListener(v -> captureWinePhoto());
+        wineActions.addView(captureWineButton, new LinearLayout.LayoutParams(0, dp(52), 1));
+
+        var prepareWineLotButton = new Button(this);
+        prepareWineLotButton.setText("Gerar lote");
+        prepareWineLotButton.setTag("primary");
+        prepareWineLotButton.setOnClickListener(v -> prepareWineLotFromOcr());
+        wineActions.addView(prepareWineLotButton, new LinearLayout.LayoutParams(0, dp(52), 1));
+        ocrPage.addView(wineActions, withBottomMargin(fullWidth(-2), dp(8)));
 
         var ocrActions = new LinearLayout(this);
         ocrActions.setOrientation(LinearLayout.HORIZONTAL);
@@ -1471,7 +1519,7 @@ public class MainActivity extends Activity implements LifecycleOwner {
         betaPage.addView(cloudButton, fullWidth(dp(52)));
 
         var peixariaButton = new Button(this);
-        peixariaButton.setText("Padaria - rastreabilidade");
+        peixariaButton.setText("Rastreio e geração de lotes");
         peixariaButton.setTag("primary");
         peixariaButton.setOnClickListener(v -> showPage(MAIN_PAGE_PEIXARIA));
         betaPage.addView(peixariaButton, fullWidth(dp(52)));
@@ -1482,19 +1530,19 @@ public class MainActivity extends Activity implements LifecycleOwner {
         betaPage.addView(addPeixariaProductButton, fullWidth(dp(52)));
 
         var peixariaPanelButton = new Button(this);
-        peixariaPanelButton.setText("Painel Padaria");
-        peixariaPanelButton.setOnClickListener(v -> showPage("padaria_panel"));
+        peixariaPanelButton.setText("Histórico de lotes");
+        peixariaPanelButton.setOnClickListener(v -> showPage("peixaria_panel"));
         betaPage.addView(peixariaPanelButton, fullWidth(dp(52)));
 
         var primaryPageButton = new Button(this);
-        primaryPageButton.setText(isPeixariaMainPage() ? "Usar Validade como primeira aba" : "Usar Padaria como primeira aba");
+        primaryPageButton.setText(isPeixariaMainPage() ? "Usar Validade como primeira aba" : "Usar Lotes como primeira aba");
         primaryPageButton.setOnClickListener(v -> {
             boolean peixariaMain = !isPeixariaMainPage();
             setPeixariaMainPage(peixariaMain);
-            primaryPageButton.setText(peixariaMain ? "Usar Validade como primeira aba" : "Usar Padaria como primeira aba");
+            primaryPageButton.setText(peixariaMain ? "Usar Validade como primeira aba" : "Usar Lotes como primeira aba");
             updatePrimaryTabButton();
             showPage(peixariaMain ? MAIN_PAGE_PEIXARIA : "validity");
-            setStatus(peixariaMain ? "Padaria sera a primeira aba ao abrir o app." : "Validade sera a primeira aba ao abrir o app.");
+            setStatus(peixariaMain ? "Lotes sera a primeira aba ao abrir o app." : "Validade sera a primeira aba ao abrir o app.");
         });
         betaPage.addView(primaryPageButton, fullWidth(dp(52)));
 
@@ -1569,7 +1617,7 @@ public class MainActivity extends Activity implements LifecycleOwner {
 
     private void buildPeixariaPage() {
         var title = new TextView(this);
-        title.setText("Padaria - rastreabilidade");
+        title.setText("Rastreio de lotes");
         title.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18);
         title.setTextColor(COLOR_TEXT);
         title.setTypeface(Typeface.DEFAULT_BOLD);
@@ -1577,7 +1625,7 @@ public class MainActivity extends Activity implements LifecycleOwner {
         peixariaPage.addView(title, fullWidth(-2));
 
         var subtitle = new TextView(this);
-        subtitle.setText("Etiqueta 50x30 com lote anual sequencial. Fornecedor: Padaria Lobo.");
+        subtitle.setText("Gere, imprima e acompanhe lotes com origem, endereço e validade.");
         subtitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
         subtitle.setTextColor(COLOR_MUTED);
         subtitle.setPadding(0, 0, 0, dp(8));
@@ -1742,14 +1790,14 @@ public class MainActivity extends Activity implements LifecycleOwner {
         peixariaPage.addView(labelActions, fullWidth(-2));
 
         var panelButton = new Button(this);
-        panelButton.setText("Painel Padaria");
-        panelButton.setOnClickListener(v -> showPage("padaria_panel"));
+        panelButton.setText("Painel de lotes");
+        panelButton.setOnClickListener(v -> showPage("peixaria_panel"));
         peixariaPage.addView(panelButton, fullWidth(dp(52)));
     }
 
     private void buildPeixariaPanelPage() {
         var title = new TextView(this);
-        title.setText("Painel Padaria");
+        title.setText("Painel de rastreio de lotes");
         title.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18);
         title.setTextColor(COLOR_TEXT);
         title.setTypeface(Typeface.DEFAULT_BOLD);
@@ -1771,7 +1819,7 @@ public class MainActivity extends Activity implements LifecycleOwner {
         refreshButton.setOnClickListener(v -> refreshPeixariaPanel());
         actions.addView(refreshButton, new LinearLayout.LayoutParams(0, dp(52), 1));
         var backButton = new Button(this);
-        backButton.setText("Padaria");
+        backButton.setText("Rastreio");
         backButton.setOnClickListener(v -> showPage(MAIN_PAGE_PEIXARIA));
         actions.addView(backButton, new LinearLayout.LayoutParams(dp(120), dp(52)));
         var reprintButton = new Button(this);
@@ -1951,8 +1999,8 @@ public class MainActivity extends Activity implements LifecycleOwner {
         tabs.setOrientation(LinearLayout.VERTICAL);
         tabs.setPadding(0, 0, 0, dp(10));
 
-        validityTabButton = tabButton(isPeixariaMainPage() && isBetaUnlocked() ? "Peixaria" : "Validade", "validity");
-        validityTabButton.setOnClickListener(v -> showPage(isPeixariaMainPage() && isBetaUnlocked() ? MAIN_PAGE_PEIXARIA : "validity"));
+        validityTabButton = tabButton(isPeixariaMainPage() ? "Lotes" : "Validade", "validity");
+        validityTabButton.setOnClickListener(v -> showPage(isPeixariaMainPage() ? MAIN_PAGE_PEIXARIA : "validity"));
         priceTabButton = tabButton("Precos", "prices");
         catalogTabButton = tabButton("Catálogo", "catalog");
         moreTabButton = tabButton("Mais", "more");
@@ -1981,8 +2029,8 @@ public class MainActivity extends Activity implements LifecycleOwner {
         if (validityTabButton == null) {
             return;
         }
-        boolean peixariaMain = isPeixariaMainPage() && isBetaUnlocked();
-        validityTabButton.setText(peixariaMain ? "Peixaria" : "Validade");
+        boolean peixariaMain = isPeixariaMainPage();
+        validityTabButton.setText(peixariaMain ? "Lotes" : "Validade");
         validityTabButton.setOnClickListener(v -> showPage(peixariaMain ? MAIN_PAGE_PEIXARIA : "validity"));
     }
 
@@ -2054,8 +2102,17 @@ public class MainActivity extends Activity implements LifecycleOwner {
     }
 
     private void showPage(String pageName) {
+        boolean paidIntegrationRequested = MAIN_PAGE_PEIXARIA.equals(pageName)
+                || "peixaria".equals(pageName)
+                || "padaria".equals(pageName)
+                || "peixaria_panel".equals(pageName)
+                || "padaria_panel".equals(pageName);
+        if (paidIntegrationRequested && !hasPaidIntegrationEntitlement()) {
+            showPaidIntegrationLockedDialog();
+            pageName = MAIN_PAGE_VALIDITY;
+        }
         if (("beta".equals(pageName) || "ocr".equals(pageName) || "cloud".equals(pageName)
-                || MAIN_PAGE_PEIXARIA.equals(pageName) || "peixaria_panel".equals(pageName)) && !isBetaUnlocked()) {
+                || "peixaria_panel".equals(pageName) || "padaria_panel".equals(pageName)) && !isBetaUnlocked()) {
             pendingBetaPage = pageName;
             showBetaLoginDialog();
             pageName = "settings";
@@ -2075,8 +2132,8 @@ public class MainActivity extends Activity implements LifecycleOwner {
         boolean ocr = "ocr".equals(pageName);
         boolean beta = "beta".equals(pageName);
         boolean cloud = "cloud".equals(pageName);
-        boolean peixaria = MAIN_PAGE_PEIXARIA.equals(pageName);
-        boolean peixariaPanel = "padaria_panel".equals(pageName);
+        boolean peixaria = MAIN_PAGE_PEIXARIA.equals(pageName) || "peixaria".equals(pageName) || "padaria".equals(pageName);
+        boolean peixariaPanel = "peixaria_panel".equals(pageName) || "padaria_panel".equals(pageName);
         boolean secondary = alerts || history || onlyPrices || settings || more || textOnly || imageOnly || photo50x30 || ocr || beta || cloud || peixaria || peixariaPanel;
 
         if (ocr) {
@@ -2184,7 +2241,7 @@ public class MainActivity extends Activity implements LifecycleOwner {
     }
 
     private void showAboutDialog() {
-        String message = "Validade Pro\n"
+        String message = "Validade PT260\n"
                 + "Versao " + BuildConfig.VERSION_NAME + "\n"
                 + "Codigo " + BuildConfig.VERSION_CODE;
 
@@ -2200,11 +2257,139 @@ public class MainActivity extends Activity implements LifecycleOwner {
             showPage(pendingBetaPage);
             return;
         }
-        showCredentialDialog("Acesso beta", () -> {
-            setBetaUnlocked(true);
-            showPage(pendingBetaPage);
-            setStatus("Aba beta liberada.");
+
+        LinearLayout form = new LinearLayout(this);
+        form.setOrientation(LinearLayout.VERTICAL);
+        form.setPadding(dp(6), dp(8), dp(6), 0);
+
+        TextView intro = new TextView(this);
+        intro.setText("Teste de acesso beta. Sem cobrança real. Para validar o fluxo, use o modo de teste e informe nome/telefone sem gerar boleto ou cobrança verdadeira.");
+        intro.setTextColor(COLOR_MUTED);
+        intro.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
+        form.addView(intro, fullWidth(-2));
+
+        CheckBox testModeCheckBox = new CheckBox(this);
+        testModeCheckBox.setText("Modo de teste (sem cobrança real)");
+        testModeCheckBox.setTextColor(COLOR_TEXT);
+        testModeCheckBox.setChecked(true);
+        form.addView(testModeCheckBox, fullWidth(-2));
+
+        EditText nameEdit = new EditText(this);
+        nameEdit.setSingleLine(true);
+        nameEdit.setHint("Nome completo");
+        styleInput(nameEdit);
+        form.addView(field("Nome", nameEdit), fullWidth(-2));
+
+        EditText phoneEdit = new EditText(this);
+        phoneEdit.setSingleLine(true);
+        phoneEdit.setHint("Telefone com DDD");
+        phoneEdit.setInputType(android.text.InputType.TYPE_CLASS_PHONE);
+        styleInput(phoneEdit);
+        form.addView(field("Telefone", phoneEdit), fullWidth(-2));
+
+        EditText passwordEdit = new EditText(this);
+        passwordEdit.setSingleLine(true);
+        passwordEdit.setHint("Senha opcional");
+        passwordEdit.setInputType(android.text.InputType.TYPE_CLASS_TEXT | android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD);
+        styleInput(passwordEdit);
+        form.addView(field("Senha (opcional)", passwordEdit), fullWidth(-2));
+
+        CheckBox phoneOnlyCheckBox = new CheckBox(this);
+        phoneOnlyCheckBox.setText("Entrar apenas com telefone (sem senha)");
+        phoneOnlyCheckBox.setTextColor(COLOR_TEXT);
+        phoneOnlyCheckBox.setChecked(true);
+        phoneOnlyCheckBox.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            passwordEdit.setEnabled(!isChecked);
+            passwordEdit.setText(isChecked ? "" : passwordEdit.getText());
         });
+        form.addView(phoneOnlyCheckBox, fullWidth(-2));
+
+        TextView status = new TextView(this);
+        status.setTextColor(COLOR_MUTED);
+        status.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
+        status.setPadding(0, dp(8), 0, 0);
+        form.addView(status, fullWidth(-2));
+
+        Button quickTestButton = new Button(this);
+        quickTestButton.setText("Liberar teste para 11989346164");
+        quickTestButton.setTextColor(Color.WHITE);
+        quickTestButton.setBackgroundColor(Color.parseColor("#2E7D32"));
+        quickTestButton.setPadding(dp(12), dp(8), dp(12), dp(8));
+        quickTestButton.setOnClickListener(v -> {
+            nameEdit.setText("Teste PT260");
+            phoneEdit.setText("11989346164");
+            passwordEdit.setText("");
+            phoneOnlyCheckBox.setChecked(true);
+            testModeCheckBox.setChecked(true);
+            status.setText("Telefone de teste preenchido: 11989346164");
+        });
+        form.addView(quickTestButton, fullWidth(-2));
+
+        AlertDialog dialog = new AlertDialog.Builder(this)
+                .setTitle("Acesso beta")
+                .setView(form)
+                .setPositiveButton("Liberar área", null)
+                .setNegativeButton("Cancelar", null)
+                .create();
+
+        dialog.setOnShowListener(v -> {
+            Button enterButton = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
+            enterButton.setOnClickListener(button -> {
+                String name = nameEdit.getText().toString().trim();
+                String phone = normalizeBetaPhone(phoneEdit.getText().toString());
+                String password = passwordEdit.getText().toString().trim();
+                boolean phoneOnly = phoneOnlyCheckBox.isChecked() || password.isEmpty();
+                boolean testMode = testModeCheckBox.isChecked();
+
+                if (name.isEmpty()) {
+                    status.setText("Informe o nome do usuário.");
+                    return;
+                }
+                if (phone.isEmpty() || phone.length() < 10) {
+                    status.setText("Informe um telefone válido com DDD.");
+                    return;
+                }
+                if (!phoneOnly && password.length() < 4) {
+                    status.setText("Se não for login por telefone, a senha deve ter pelo menos 4 caracteres.");
+                    return;
+                }
+                if (!testMode && !isSupabaseConfigured()) {
+                    status.setText("Integração do pagamento não está pronta. Acesso real bloqueado até o backend de cobrança (Supabase/Cora/Green API) ser configurado.");
+                    return;
+                }
+
+                prefs().edit()
+                        .putString(PREF_BETA_USER_NAME, name)
+                        .putString(PREF_BETA_USER_PHONE, phone)
+                        .putString(PREF_BETA_LOGIN_MODE, phoneOnly ? "phone" : "password")
+                        .putString(PREF_BETA_CUSTOM_PASSWORD, phoneOnly ? "" : password)
+                        .putBoolean(PREF_BETA_TEST_MODE, testMode)
+                        // O modo de teste é local. A modalidade paga não pode
+                        // desbloquear a área antes do webhook/status validado.
+                        .putBoolean(PREF_BETA_UNLOCKED, testMode)
+                        .apply();
+
+                if (testMode) {
+                    syncBetaAccessProfileToSupabase(name, phone, phoneOnly ? "" : password, phoneOnly, "pix_test");
+                    notifyBetaAccessPrivateMessage(name, phone, "Acesso beta liberado em modo de teste para " + name + ". Sem cobrança real. Login: " + phone + ".");
+                    status.setText("Teste liberado para " + name + ". Sem cobrança real.");
+                } else {
+                    syncBetaAccessProfileToSupabase(name, phone, phoneOnly ? "" : password, phoneOnly, "pix");
+                    status.setText("Solicitação Pix de R$ 20,00 enviada. Aguarde o QR e a confirmação do pagamento.");
+                    setStatus("Acesso pago aguardando confirmação segura do Pix.");
+                    return;
+                }
+                animateCredentialSuccess(new ArrayList<>(), new ArrayList<>(), () -> {
+                    dialog.dismiss();
+                    setBetaUnlocked(true);
+                    showPage(pendingBetaPage);
+                    setStatus(testMode ? "Área beta liberada em modo de teste." : "Área beta liberada.");
+                });
+            });
+        });
+
+        dialog.show();
+        nameEdit.requestFocus();
     }
 
     private void showAdminConfirmDialog(Runnable onSuccess) {
@@ -2353,6 +2538,93 @@ public class MainActivity extends Activity implements LifecycleOwner {
     private boolean isValidCredential(String login, String password) {
         return (BETA_LOGIN.equalsIgnoreCase(login) && BETA_PASSWORD.equals(password))
                 || (LEGACY_BETA_LOGIN.equalsIgnoreCase(login) && LEGACY_BETA_PASSWORD.equals(password));
+    }
+
+    private String normalizeBetaPhone(String rawPhone) {
+        if (rawPhone == null) {
+            return "";
+        }
+        String digits = rawPhone.replaceAll("\\D+", "");
+        if (digits.length() >= 11) {
+            return digits;
+        }
+        if (digits.length() == 10) {
+            return "55" + digits;
+        }
+        return digits;
+    }
+
+    private void syncBetaAccessProfileToSupabase(String name, String phone, String password, boolean phoneOnly, String paymentMethod) {
+        if (!isSupabaseConfigured()) {
+            return;
+        }
+        new Thread(() -> {
+            try {
+                JSONObject payload = new JSONObject();
+                payload.put("user_name", name);
+                payload.put("phone", phone);
+                payload.put("login_mode", phoneOnly ? "phone" : "password");
+                payload.put("password_set", !phoneOnly);
+                // A liberação não é decidida pelo aparelho. Em Pix real ela só
+                // acontece depois de o backend receber e validar o pagamento.
+                payload.put("paid_access", false);
+                payload.put("payment_method", paymentMethod);
+                payload.put("invoice_type", "none");
+                payload.put("price_cents", "pix_test".equals(paymentMethod) ? 0 : 2000);
+                payload.put("source", "app_beta_area");
+                payload.put("device_id", installationId());
+                payload.put("password_hash", phoneOnly ? "" : sha256(password));
+                postSupabaseRpc(SUPABASE_RPC_REGISTER_BETA_ACCESS, payload);
+                if (!"pix_test".equals(paymentMethod)) {
+                    triggerSecureCoraCheckout(name, phone, paymentMethod);
+                }
+            } catch (Exception e) {
+                Log.w(TAG, "Falha ao registrar beta access no Supabase", e);
+            }
+        }).start();
+    }
+
+    private void triggerSecureCoraCheckout(String name, String phone, String paymentMethod) {
+        if (!isSupabaseConfigured()) {
+            return;
+        }
+        new Thread(() -> {
+            try {
+                JSONObject payload = new JSONObject();
+                payload.put("user_name", name);
+                payload.put("phone", phone);
+                payload.put("payment_method", paymentMethod);
+                payload.put("gateway", "cora_backend");
+                // R$ 20,00: o valor também será imposto pelo backend, para que
+                // uma versão alterada do aplicativo não consiga trocá-lo.
+                payload.put("amount_cents", 2000);
+                payload.put("source", "app_beta_area");
+                payload.put("device_id", installationId());
+                payload.put("notes", "Checkout seguro do cliente via backend. Nenhuma credencial da Cora no app.");
+                postSupabaseRpc(SUPABASE_RPC_CREATE_CORA_CHECKOUT, payload);
+            } catch (Exception e) {
+                Log.w(TAG, "Falha ao disparar checkout seguro da Cora", e);
+            }
+        }).start();
+    }
+
+    private void notifyBetaAccessPrivateMessage(String name, String phone, String message) {
+        if (!isSupabaseConfigured()) {
+            return;
+        }
+        new Thread(() -> {
+            try {
+                JSONObject payload = new JSONObject();
+                payload.put("user_name", name);
+                payload.put("phone", phone);
+                payload.put("message", message);
+                payload.put("channel", "private_whatsapp");
+                payload.put("payment_method", "pix_test");
+                postSupabaseRpc(SUPABASE_RPC_NOTIFY_BETA_ACCESS, payload);
+            } catch (Exception e) {
+                Log.w(TAG, "Falha ao notificar acesso beta privado", e);
+            }
+        }).start();
     }
 
     private void animateCredentialSuccess(List<EditText> loginBoxes, List<EditText> passwordBoxes, Runnable onComplete) {
@@ -2599,7 +2871,7 @@ public class MainActivity extends Activity implements LifecycleOwner {
     }
 
     private String currentEstablishmentName() {
-        return prefs().getString(PREF_ESTABLISHMENT_NAME, "Padaria Lobo");
+        return prefs().getString(PREF_ESTABLISHMENT_NAME, "P2");
     }
 
     private void saveEstablishmentName() {
@@ -2608,7 +2880,7 @@ public class MainActivity extends Activity implements LifecycleOwner {
         }
         String name = establishmentNameEdit.getText().toString().trim();
         prefs().edit().putString(PREF_ESTABLISHMENT_NAME,
-                name.isEmpty() ? "Padaria Lobo" : name).apply();
+                name.isEmpty() ? "P2" : name).apply();
         updateCurrentProfileBanner();
     }
 
@@ -2865,10 +3137,19 @@ public class MainActivity extends Activity implements LifecycleOwner {
     }
 
     private void checkForUpdates(boolean manual) {
-        checkForUpdates(manual, !manual);
-    }
+        if (!BuildConfig.GITHUB_DISTRIBUTION) {
+            lastUpdateCheckMs = System.currentTimeMillis();
+            if (manual) {
+                new AlertDialog.Builder(this)
+                        .setTitle("Atualizações pela Google Play")
+                        .setMessage("Esta instalação recebe atualizações pela Google Play. A versão gratuita de Validade continua disponível normalmente.")
+                        .setPositiveButton("Abrir Google Play", (dialog, which) -> openPlayStorePage())
+                        .setNegativeButton("Agora não", null)
+                        .show();
+            }
+            return;
+        }
 
-    private void checkForUpdates(boolean manual, boolean forceWhenAvailable) {
         lastUpdateCheckMs = System.currentTimeMillis();
         if (manual) {
             setStatus("Verificando atualizacao...");
@@ -2882,9 +3163,11 @@ public class MainActivity extends Activity implements LifecycleOwner {
                 String latestName = update.optString("latestVersionName", "");
                 String apkUrl = update.optString("apkUrl", "");
                 String notes = update.optString("notes", "");
+                String mandatoryAfter = update.optString("mandatoryAfter", "");
+                boolean forced = isMandatoryUpdateDue(mandatoryAfter);
 
                 if (latestCode > BuildConfig.VERSION_CODE && !apkUrl.isEmpty()) {
-                    runOnUiThread(() -> showUpdateDialog(latestName, notes, apkUrl, forceWhenAvailable));
+                    runOnUiThread(() -> showUpdateDialog(latestName, notes, apkUrl, forced));
                 } else if (manual) {
                     setStatus("App ja esta atualizado. Versao " + BuildConfig.VERSION_NAME + ".");
                 }
@@ -2894,6 +3177,29 @@ public class MainActivity extends Activity implements LifecycleOwner {
                 }
             }
         }).start();
+    }
+
+    private boolean isMandatoryUpdateDue(String mandatoryAfter) {
+        if (mandatoryAfter == null || mandatoryAfter.trim().isEmpty()) {
+            return false;
+        }
+        try {
+            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX", Locale.US);
+            Date deadline = format.parse(mandatoryAfter.trim());
+            return deadline != null && System.currentTimeMillis() >= deadline.getTime();
+        } catch (ParseException ignored) {
+            return false;
+        }
+    }
+
+    private void openPlayStorePage() {
+        Uri marketUri = Uri.parse("market://details?id=" + getPackageName());
+        try {
+            startActivity(new Intent(Intent.ACTION_VIEW, marketUri));
+        } catch (Exception ignored) {
+            startActivity(new Intent(Intent.ACTION_VIEW,
+                    Uri.parse("https://play.google.com/store/apps/details?id=" + getPackageName())));
+        }
     }
 
     private void showUpdateDialog(String latestName, String notes, String apkUrl, boolean forced) {
@@ -3346,13 +3652,43 @@ public class MainActivity extends Activity implements LifecycleOwner {
         return getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
     }
 
+    private void maybeShowOfficialReleaseNotice() {
+        int shownVersion = prefs().getInt(PREF_RELEASE_NOTICE_VERSION, 0);
+        if (shownVersion >= BuildConfig.VERSION_CODE) {
+            return;
+        }
+        new AlertDialog.Builder(this)
+                .setTitle("Versão oficial liberada")
+                .setMessage("Esta versão foi liberada pelo responsável do sistema, Alex Fabio Curiel da Silva.\n\nA função Validade continua gratuita. Recursos de integração empresarial somente são ativados após confirmação clara do responsável e do pagamento correspondente.")
+                .setPositiveButton("Entendi", (dialog, which) -> prefs().edit()
+                        .putInt(PREF_RELEASE_NOTICE_VERSION, BuildConfig.VERSION_CODE)
+                        .apply())
+                .setCancelable(false)
+                .show();
+    }
+
     private boolean isPeixariaMainPage() {
         String page = prefs().getString(PREF_MAIN_PAGE, MAIN_PAGE_VALIDITY);
-        return MAIN_PAGE_PEIXARIA.equals(page);
+        return MAIN_PAGE_PEIXARIA.equals(page) || "peixaria".equals(page) || "padaria".equals(page);
     }
 
     private void setPeixariaMainPage(boolean peixaria) {
         prefs().edit().putString(PREF_MAIN_PAGE, peixaria ? MAIN_PAGE_PEIXARIA : MAIN_PAGE_VALIDITY).apply();
+    }
+
+    private boolean hasPaidIntegrationEntitlement() {
+        // A permissão é concedida pelo backend após confirmação financeira.
+        // O modo beta, senhas e valores armazenados no aparelho nunca liberam
+        // a área empresarial por conta própria.
+        return prefs().getLong(PREF_INTEGRATION_ENTITLEMENT_UNTIL, 0L) > System.currentTimeMillis();
+    }
+
+    private void showPaidIntegrationLockedDialog() {
+        new AlertDialog.Builder(this)
+                .setTitle("Integração Padaria")
+                .setMessage("Esta área exige uma licença empresarial ativa. A Validade continua gratuita. A licença é confirmada pelo sistema integrado após a cobrança empresarial.")
+                .setPositiveButton("Entendi", null)
+                .show();
     }
 
     private boolean isSupabaseConfigured() {
@@ -3613,7 +3949,7 @@ public class MainActivity extends Activity implements LifecycleOwner {
                 postSupabaseRpc(SUPABASE_RPC_RECORD_PRINT, buildPadariaLotPayload(entry));
                 runOnUiThread(() -> setStatus("Lote " + entry.lot + " salvo na nuvem."));
             } catch (Exception e) {
-                Log.w(TAG, "Falha ao sincronizar lote da padaria no Supabase", e);
+                Log.w(TAG, "Falha ao sincronizar lote da peixaria no Supabase", e);
                 runOnUiThread(() -> setStatus("Lote salvo no aparelho; nuvem pendente."));
             }
         }).start();
@@ -3626,13 +3962,13 @@ public class MainActivity extends Activity implements LifecycleOwner {
         payload.put("product", entry.product);
         payload.put("copies", entry.copies);
         payload.put("expiry_at_ms", entry.expiryAt);
-        payload.put("source", "android_padaria_lote");
+        payload.put("source", "android_validade_pt260_lote");
         payload.put("company_name", currentEstablishmentName());
         JSONObject metadata = new JSONObject();
         metadata.put("lote", entry.lot);
         metadata.put("peso_kg", entry.weightKg);
         metadata.put("origem", currentPadariaAddress());
-        metadata.put("tipo", "padaria");
+        metadata.put("tipo", "rastreabilidade_lote");
         payload.put("metadata", metadata);
         return payload;
     }
@@ -3987,7 +4323,7 @@ public class MainActivity extends Activity implements LifecycleOwner {
         payload.put("region_language", nullToEmpty(locale.getLanguage()));
         payload.put("app_version_name", BuildConfig.VERSION_NAME);
         payload.put("app_version_code", BuildConfig.VERSION_CODE);
-        payload.put("establishment_slug", prefs().getString(PREF_ACTIVE_ESTABLISHMENT_SLUG, "padaria-lobo"));
+        payload.put("establishment_slug", prefs().getString(PREF_ACTIVE_ESTABLISHMENT_SLUG, "peixaria-pt260"));
         payload.put("establishment_password", prefs().getString(PREF_ACTIVE_ESTABLISHMENT_PASSWORD, BETA_PASSWORD));
         return payload;
     }
@@ -5056,7 +5392,11 @@ public class MainActivity extends Activity implements LifecycleOwner {
         int currentYear = calendar.get(Calendar.YEAR);
         int savedYear = prefs().getInt(PREF_PEIXARIA_LOTE_YEAR, currentYear);
         int sequence = savedYear == currentYear ? prefs().getInt(PREF_PEIXARIA_LOTE_SEQUENCE, 0) + 1 : 1;
-        return String.format(Locale.US, "%03d/%d", Math.max(1, sequence), currentYear);
+        return String.format(Locale.US, "Lote %03d - %02d/%02d/%02d",
+                Math.max(1, sequence),
+                calendar.get(Calendar.DAY_OF_MONTH),
+                calendar.get(Calendar.MONTH) + 1,
+                currentYear % 100);
     }
 
     // Reserve and persist the next lot for the current year, returning the reserved lot string.
@@ -5069,7 +5409,11 @@ public class MainActivity extends Activity implements LifecycleOwner {
                 .putInt(PREF_PEIXARIA_LOTE_YEAR, currentYear)
                 .putInt(PREF_PEIXARIA_LOTE_SEQUENCE, nextSeq)
                 .apply();
-        return String.format(Locale.US, "%03d/%d", Math.max(1, nextSeq), currentYear);
+        return String.format(Locale.US, "Lote %03d - %02d/%02d/%02d",
+                Math.max(1, nextSeq),
+                calendar.get(Calendar.DAY_OF_MONTH),
+                calendar.get(Calendar.MONTH) + 1,
+                currentYear % 100);
     }
 
     private PeixariaEntry createPeixariaEntry(String product, String weight, int copies) {
@@ -5083,8 +5427,8 @@ public class MainActivity extends Activity implements LifecycleOwner {
         }
         Calendar calendar = Calendar.getInstance();
         int currentYear = calendar.get(Calendar.YEAR);
-        int slash = entry.lot.indexOf('/');
-        int sequence = slash > 0 ? safeParseInt(entry.lot.substring(0, slash), 1) : 1;
+        Matcher lotMatcher = Pattern.compile("Lote\\s+(\\d+)", Pattern.CASE_INSENSITIVE).matcher(entry.lot);
+        int sequence = lotMatcher.find() ? safeParseInt(lotMatcher.group(1), 1) : 1;
         prefs().edit()
                 .putInt(PREF_PEIXARIA_LOTE_YEAR, currentYear)
                 .putInt(PREF_PEIXARIA_LOTE_SEQUENCE, sequence)
@@ -5180,10 +5524,10 @@ public class MainActivity extends Activity implements LifecycleOwner {
     private void showAddPeixariaProductDialog() {
         var input = new EditText(this);
         input.setSingleLine(true);
-        input.setHint("Nome do produto de padaria");
+        input.setHint("Nome do produto de peixaria");
         styleInput(input);
         new AlertDialog.Builder(this)
-                .setTitle("Novo produto de padaria")
+                .setTitle("Novo produto de peixaria")
                 .setMessage("Adicione um produto que ainda nao esteja no catalogo da rastreabilidade.")
                 .setView(input)
                 .setPositiveButton("Salvar", (dialog, which) -> {
@@ -5195,7 +5539,7 @@ public class MainActivity extends Activity implements LifecycleOwner {
                     List<String> products = loadPeixariaProductCatalog();
                     for (String existing : products) {
                         if (existing.equalsIgnoreCase(product)) {
-                            setStatus("Produto ja existe no catalogo da padaria.");
+                            setStatus("Produto ja existe no catalogo da peixaria.");
                             return;
                         }
                     }
@@ -5218,7 +5562,7 @@ public class MainActivity extends Activity implements LifecycleOwner {
         if (peixariaPreviewText != null) {
             String product = peixariaProductEdit == null ? "" : peixariaProductEdit.getText().toString().trim();
             peixariaPreviewText.setText("Proximo lote: " + nextPeixariaLotPreview()
-                    + "\nOrigem: Padaria Lobo"
+                    + "\nOrigem: " + currentEstablishmentName()
                     + "\nEndereco de origem: " + currentPadariaAddress()
                     + "\nRecebimento e processamento: hoje | Validade: " + peixariaValiditySummary(product));
         }
@@ -5277,7 +5621,7 @@ public class MainActivity extends Activity implements LifecycleOwner {
 
         new AlertDialog.Builder(this)
                 .setTitle("Ajustes da rastreabilidade")
-                .setMessage("Defina o endereco de origem que sera impresso nos lotes da padaria. Destino nao e preenchido.")
+                .setMessage("Defina o endereco de origem que sera impresso nos lotes da peixaria. Destino nao e preenchido.")
                 .setView(field("Endereco de origem", addressEdit))
                 .setNegativeButton("Cancelar", null)
                 .setPositiveButton("Salvar", (dialog, which) -> {
@@ -5373,7 +5717,7 @@ public class MainActivity extends Activity implements LifecycleOwner {
         if (!isKnownPeixariaProduct(product)) {
             new AlertDialog.Builder(this)
                     .setTitle("Produto novo")
-                    .setMessage("Salvar \"" + product + "\" no catalogo da padaria antes de imprimir?")
+                    .setMessage("Salvar \"" + product + "\" no catalogo da peixaria antes de imprimir?")
                     .setPositiveButton("Salvar", (dialog, which) -> {
                         List<String> products = loadPeixariaProductCatalog();
                         products.add(product);
@@ -5506,7 +5850,7 @@ public class MainActivity extends Activity implements LifecycleOwner {
         paint.setTextSize(18f);
         paint.setFakeBoldText(false);
         canvas.drawText("PROD: " + cleanPrinterText(entry.product), 12f, 80f, paint);
-        canvas.drawText("ORIGEM: PADARIA LOBO", 12f, 110f, paint);
+        canvas.drawText("ORIGEM: " + cleanPrinterText(currentEstablishmentName()), 12f, 110f, paint);
         List<String> addressLines = splitLabelText("END: " + cleanPrinterText(currentPadariaAddress()), 26);
         paint.setTextSize(14f);
         for (int index = 0; index < Math.min(3, addressLines.size()); index++) {
@@ -6621,7 +6965,7 @@ public class MainActivity extends Activity implements LifecycleOwner {
             writeAscii(output, "TEXT 12,8,\"3\",0,1,1,\"ETIQUETA DE RASTREABILIDADE\"\r\n");
             writeAscii(output, "BAR 10,35,370,2\r\n");
             writeAscii(output, "TEXT 12,45,\"2\",0,1,1,\"PROD: " + tsplText(product) + "\"\r\n");
-            writeAscii(output, "TEXT 12,67,\"2\",0,1,1,\"ORIGEM: PADARIA LOBO\"\r\n");
+            writeAscii(output, "TEXT 12,67,\"2\",0,1,1,\"ORIGEM: " + tsplText(currentEstablishmentName()) + "\"\r\n");
             for (int line = 0; line < Math.min(3, addressLines.size()); line++) {
                 writeAscii(output, "TEXT 12," + (89 + line * 16) + ",\"1\",0,1,1,\"" + addressLines.get(line) + "\"\r\n");
             }
@@ -7241,7 +7585,7 @@ public class MainActivity extends Activity implements LifecycleOwner {
     private TextOnlyLayout layoutTextOnly(String text) {
         String clean = cleanPrinterText(text).replace('\r', '\n').trim();
         for (int multiplier = 3; multiplier >= 1; multiplier--) {
-            int maxChars = Math.max(6, 22 / multiplier);
+            int maxChars = Math.min(MAX_TEXT_ONLY_LINE_CHARS, Math.max(6, 22 / multiplier));
             List<String> lines = wrapMultiLineText(clean, maxChars);
             int maxLines = Math.max(1, 156 / (30 * multiplier));
             if (lines.size() <= maxLines) {
@@ -7249,7 +7593,7 @@ public class MainActivity extends Activity implements LifecycleOwner {
             }
         }
 
-        List<String> lines = wrapMultiLineText(clean, 22);
+        List<String> lines = wrapMultiLineText(clean, MAX_TEXT_ONLY_LINE_CHARS);
         int limit = Math.min(5, lines.size());
         return new TextOnlyLayout(1, new ArrayList<>(lines.subList(0, limit)));
     }
@@ -7669,8 +8013,22 @@ public class MainActivity extends Activity implements LifecycleOwner {
         if (textRecognizer == null) {
             textRecognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS);
         }
+        if (barcodeScanner == null) {
+            barcodeScanner = BarcodeScanning.getClient(new BarcodeScannerOptions.Builder()
+                    .setBarcodeFormats(
+                            Barcode.FORMAT_QR_CODE,
+                            Barcode.FORMAT_EAN_13,
+                            Barcode.FORMAT_EAN_8,
+                            Barcode.FORMAT_UPC_A,
+                            Barcode.FORMAT_UPC_E,
+                            Barcode.FORMAT_CODE_128,
+                            Barcode.FORMAT_CODE_39,
+                            Barcode.FORMAT_CODE_93,
+                            Barcode.FORMAT_ITF)
+                    .build());
+        }
 
-        updateOcrStatus("OCR ativo. Camera " + (ocrUseFrontCamera ? "frontal" : "traseira") + ".");
+        updateOcrStatus("OCR + QR/Barcode ativo. Camera " + (ocrUseFrontCamera ? "frontal" : "traseira") + ".");
         ListenableFuture<ProcessCameraProvider> providerFuture = ProcessCameraProvider.getInstance(this);
         providerFuture.addListener(() -> {
             try {
@@ -7731,6 +8089,43 @@ public class MainActivity extends Activity implements LifecycleOwner {
         ocrUseFrontCamera = !ocrUseFrontCamera;
         stopOcrCamera();
         startOcrCameraIfReady();
+    }
+
+    private void captureWinePhoto() {
+        if (ocrPreviewView == null) {
+            showError("Camera OCR indisponivel.");
+            return;
+        }
+        Bitmap snapshot = ocrPreviewView.getBitmap();
+        if (snapshot == null) {
+            showError("Nao foi possivel capturar a foto do vinho.");
+            return;
+        }
+        winePhotoBitmap = snapshot;
+        updateOcrStatus("Foto capturada. Confira a legenda e o nome lido pelo OCR.");
+        setStatus("Foto do vinho capturada localmente; nada foi enviado ao WhatsApp.");
+    }
+
+    private void prepareWineLotFromOcr() {
+        String caption = wineCaptionEdit == null ? "" : wineCaptionEdit.getText().toString().trim();
+        String recognized = ocrResultText == null ? "" : ocrResultText.getText().toString().trim();
+        String product = caption.isEmpty() ? recognized : caption;
+        product = cleanPrinterText(product).replace('\n', ' ').replaceAll("\\s+", " ").trim();
+        if (product.isEmpty() || product.equalsIgnoreCase("OCR aguardando etiqueta.")) {
+            showError("Fotografe o rotulo ou informe a legenda do vinho.");
+            return;
+        }
+        if (product.length() > 80) {
+            product = product.substring(0, 80).trim();
+        }
+        if (peixariaProductEdit != null) {
+            peixariaProductEdit.setText(product);
+            if (peixariaProductManualCheck != null) {
+                peixariaProductManualCheck.setChecked(true);
+            }
+        }
+        showPage(MAIN_PAGE_PEIXARIA);
+        setStatus("Vinho identificado: confira catalogo, endereco e quantidade antes de gerar o lote.");
     }
 
     @SuppressLint("UnsafeOptInUsageError")
@@ -7803,7 +8198,13 @@ public class MainActivity extends Activity implements LifecycleOwner {
         }
 
         if (candidates.isEmpty()) {
-            return null;
+            // Rótulos de vinho e outros itens de catálogo normalmente não têm
+            // data de preparo/validade. Ainda assim o OCR deve sugerir a marca
+            // para edição humana, sem tratar o produto como uma etiqueta vencida.
+            String product = inferOcrProductName(lines);
+            return "Produto OCR".equalsIgnoreCase(product)
+                    ? null
+                    : OcrScanResult.productOnly(product, cleanText);
         }
 
         List<DateCandidate> expiryCandidates = new ArrayList<>();
@@ -7969,6 +8370,17 @@ public class MainActivity extends Activity implements LifecycleOwner {
         syncOcrCheckAsync(result);
 
         if (!result.complete) {
+            if ("PRODUCT_IDENTIFIED".equals(result.status)) {
+                String suggestion = result.product;
+                if (wineCaptionEdit != null && (wineCaptionEdit.getText() == null
+                        || wineCaptionEdit.getText().toString().trim().isEmpty())) {
+                    wineCaptionEdit.setText(suggestion);
+                }
+                updateOcrStatus("Marca identificada. Confira e edite antes de gerar o lote.");
+                updateOcrResult("Produto sugerido: " + suggestion + "\nSem data detectada — não é uma validação de vencimento.");
+                setStatus("OCR sugeriu um produto para o catálogo integrado.");
+                return;
+            }
             playOcrAlertBeeps();
             updateOcrStatus(result.status);
             updateOcrResult(result.status + "\nConfira se a etiqueta tem data inicial e validade.");
@@ -8192,6 +8604,10 @@ public class MainActivity extends Activity implements LifecycleOwner {
         static OcrScanResult incomplete(String status, String rawText) {
             return new OcrScanResult("Produto OCR", 0, 0, false, false, status, rawText);
         }
+
+        static OcrScanResult productOnly(String product, String rawText) {
+            return new OcrScanResult(product, 0, 0, false, false, "PRODUCT_IDENTIFIED", rawText);
+        }
     }
 
     private static class DateCandidate {
@@ -8366,4 +8782,3 @@ public class MainActivity extends Activity implements LifecycleOwner {
         public abstract void onSelected(int position);
     }
 }
-

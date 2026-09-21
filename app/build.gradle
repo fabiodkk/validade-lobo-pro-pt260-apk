@@ -25,28 +25,48 @@ android {
     compileSdk 36
 
     defaultConfig {
-        applicationId "br.com.validadelobopro"
         minSdk 23
         targetSdk 36
-        versionCode 45
-        versionName "1.22.2"
+        versionCode 47
+        versionName "1.22.4"
 
         buildConfigField "String", "SUPABASE_URL", "\"${javaString(supabaseProperties.getProperty("SUPABASE_URL", ""))}\""
         buildConfigField "String", "SUPABASE_ANON_KEY", "\"${javaString(supabaseProperties.getProperty("SUPABASE_ANON_KEY", ""))}\""
     }
 
+    flavorDimensions "distribuicao"
+    productFlavors {
+        play {
+            dimension "distribuicao"
+            // Pacote da ficha existente no Google Play.
+            applicationId "br.com.validadept260"
+            buildConfigField "boolean", "GITHUB_DISTRIBUTION", "false"
+        }
+        github {
+            dimension "distribuicao"
+            // Mantém compatibilidade com os APKs já instalados pelo GitHub.
+            applicationId "br.com.validadelobopro"
+            buildConfigField "boolean", "GITHUB_DISTRIBUTION", "true"
+        }
+    }
+
     signingConfigs {
         release {
             if (keystorePropertiesFile.exists()) {
-                storeFile rootProject.file(keystoreProperties.getProperty("storeFile", ""))
-                storePassword keystoreProperties.getProperty("storePassword", "")
-                keyAlias keystoreProperties.getProperty("keyAlias", "")
-                keyPassword keystoreProperties.getProperty("keyPassword", "")
+                storeFile rootProject.file(System.getenv("PT260_UPLOAD_STORE_FILE") ?: keystoreProperties.getProperty("storeFile", ""))
+                storePassword System.getenv("PT260_UPLOAD_STORE_PASSWORD") ?: keystoreProperties.getProperty("storePassword", "")
+                keyAlias System.getenv("PT260_UPLOAD_KEY_ALIAS") ?: keystoreProperties.getProperty("keyAlias", "")
+                keyPassword System.getenv("PT260_UPLOAD_KEY_PASSWORD") ?: keystoreProperties.getProperty("keyPassword", "")
             }
         }
     }
 
     buildTypes {
+        debug {
+            // Instala lado a lado com a versão distribuída pela Play Store.
+            applicationIdSuffix ".teste"
+            versionNameSuffix "-teste"
+        }
         release {
             minifyEnabled false
             if (keystorePropertiesFile.exists()) {
@@ -70,7 +90,9 @@ dependencies {
     implementation "androidx.camera:camera-lifecycle:1.4.2"
     implementation "androidx.camera:camera-view:1.4.2"
     implementation "com.google.mlkit:text-recognition:16.0.1"
+    // OCR lê o rótulo e o leitor reconhece QR/EAN localmente; ambos funcionam
+    // sem enviar imagem do produto para um serviço externo.
+    implementation "com.google.mlkit:barcode-scanning:17.3.0"
 
     testImplementation "junit:junit:4.13.2"
 }
-
