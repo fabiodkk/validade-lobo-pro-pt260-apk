@@ -2705,6 +2705,12 @@ public class MainActivity extends Activity implements LifecycleOwner {
                         setBetaUnlocked(true);
                         setStatus("Acesso às integrações liberado pelo vendedor.");
                     });
+                } else if (("blocked".equalsIgnoreCase(response.optString("status"))
+                        || "revoked".equalsIgnoreCase(response.optString("status"))) && isBetaUnlocked()) {
+                    runOnUiThread(() -> {
+                        setBetaUnlocked(false);
+                        setStatus("Acesso às integrações bloqueado remotamente. Fale com o responsável.");
+                    });
                 }
             } catch (Exception e) {
                 Log.w(TAG, "Falha ao consultar aprovação beta", e);
