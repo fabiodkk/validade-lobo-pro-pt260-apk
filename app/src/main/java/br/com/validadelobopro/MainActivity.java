@@ -2325,6 +2325,12 @@ public class MainActivity extends Activity implements LifecycleOwner {
         planSpinner.setAdapter(planAdapter);
         form.addView(field("Plano ou vínculo", planSpinner), fullWidth(-2));
 
+        CheckBox consentCheckBox = new CheckBox(this);
+        consentCheckBox.setText("Autorizo o cadastro do nome, telefone, modelo do aparelho e identificador da instalação para confirmação de acesso, limite de dispositivos, suporte e contato comercial.");
+        consentCheckBox.setTextColor(COLOR_TEXT);
+        consentCheckBox.setChecked(false);
+        form.addView(consentCheckBox, fullWidth(-2));
+
         EditText passwordEdit = new EditText(this);
         passwordEdit.setSingleLine(true);
         passwordEdit.setHint("Senha opcional");
@@ -2391,6 +2397,10 @@ public class MainActivity extends Activity implements LifecycleOwner {
                 }
                 if (!phoneOnly && password.length() < 4) {
                     status.setText("Se não for login por telefone, a senha deve ter pelo menos 4 caracteres.");
+                    return;
+                }
+                if (!consentCheckBox.isChecked()) {
+                    status.setText("Confirme a autorização de cadastro para continuar.");
                     return;
                 }
                 if (!testMode && !isSupabaseConfigured()) {
@@ -2621,6 +2631,8 @@ public class MainActivity extends Activity implements LifecycleOwner {
                 payload.put("price_cents", requestedPlan.contains("119") ? 11900 : 0);
                 payload.put("source", "app_beta_area");
                 payload.put("device_id", installationId());
+                payload.put("device_model", Build.MANUFACTURER + " " + Build.MODEL);
+                payload.put("android_version", Build.VERSION.RELEASE);
                 payload.put("password_hash", phoneOnly ? "" : sha256(password));
                 postSupabaseRpc(SUPABASE_RPC_REGISTER_BETA_ACCESS, payload);
             } catch (Exception e) {
@@ -2668,6 +2680,9 @@ public class MainActivity extends Activity implements LifecycleOwner {
                 payload.put("payment_method", "pix_test");
                 payload.put("relationship", relationship);
                 payload.put("requested_plan", requestedPlan);
+                payload.put("device_id", installationId());
+                payload.put("device_model", Build.MANUFACTURER + " " + Build.MODEL);
+                payload.put("android_version", Build.VERSION.RELEASE);
                 postSupabaseRpc(SUPABASE_RPC_NOTIFY_BETA_ACCESS, payload);
             } catch (Exception e) {
                 Log.w(TAG, "Falha ao notificar acesso beta privado", e);
