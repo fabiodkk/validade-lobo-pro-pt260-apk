@@ -36,6 +36,8 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Typeface;
 import android.graphics.drawable.GradientDrawable;
+import android.location.Location;
+import android.location.LocationManager;
 import android.media.AudioManager;
 import android.media.ToneGenerator;
 import android.net.Uri;
@@ -132,6 +134,10 @@ public class MainActivity extends Activity implements LifecycleOwner {
     private static final int REQUEST_CAMERA = 265;
     private static final int REQUEST_IMAGE_ONLY_IMAGE = 266;
     private static final int REQUEST_PHOTO_50X30_IMAGE = 267;
+    private static final String PREF_P2_LATITUDE = "p2_latitude";
+    private static final String PREF_P2_LONGITUDE = "p2_longitude";
+    private static final String P2_ESTABLISHMENT_SLUG = "p2";
+    private static final float P2_AUTO_RADIUS_METERS = 5f;
     private static final String PREFS_NAME = "catalogo";
     private static final String PREF_CATALOG_JSON = "catalog_json";
     private static final String PREF_CATALOG_URL = "catalog_url";
@@ -561,6 +567,9 @@ public class MainActivity extends Activity implements LifecycleOwner {
         shortDateTimeFormat.setLenient(false);
         // Load optional runtime config from assets/.env (local test overrides)
         loadEnvProperties();
+        // Integrações pagas começam fechadas em toda inicialização. Somente a
+        // resposta canônica do Supabase pode reabri-las.
+        prefs().edit().putBoolean(PREF_BETA_UNLOCKED, false).apply();
         CatalogData catalog = loadCatalog();
         todosProdutos.addAll(catalog.products);
         categoriasMap.clear();
@@ -586,6 +595,7 @@ public class MainActivity extends Activity implements LifecycleOwner {
         syncPendingPrintHistoryAsync();
         syncPadariaHistoryAsync();
         checkBetaAccessApprovalAsync();
+        autoSelectP2FromLocation();
     }
 
     @Override
@@ -2419,7 +2429,7 @@ public class MainActivity extends Activity implements LifecycleOwner {
                         .putBoolean(PREF_BETA_TEST_MODE, testMode)
                         // O modo de teste é local. A modalidade paga não pode
                         // desbloquear a área antes do webhook/status validado.
-                        .putBoolean(PREF_BETA_UNLOCKED, testMode)
+                        .putBoolean(PREF_BETA_UNLOCKED, false)
                         .apply();
 
                 if (testMode) {
@@ -2427,7 +2437,7 @@ public class MainActivity extends Activity implements LifecycleOwner {
                             "test", relationship, requestedPlan);
                     notifyBetaAccessPrivateMessage(name, phone,
                             "Cadastro de teste recebido.", relationship, requestedPlan);
-                    status.setText("Teste liberado para " + name + ". Sem cobrança real.");
+                    status.setText("Cadastro de teste enviado. A área permanece bloqueada até sua aprovação no painel.");
                 } else {
                     syncBetaAccessProfileToSupabase(name, phone, phoneOnly ? "" : password, phoneOnly,
                             "plan_request", relationship, requestedPlan);
@@ -2437,12 +2447,9 @@ public class MainActivity extends Activity implements LifecycleOwner {
                     setStatus("Cadastro enviado para confirmação pelo WhatsApp.");
                     return;
                 }
-                animateCredentialSuccess(new ArrayList<>(), new ArrayList<>(), () -> {
-                    dialog.dismiss();
-                    setBetaUnlocked(true);
-                    showPage(pendingBetaPage);
-                    setStatus(testMode ? "Área beta liberada em modo de teste." : "Área beta liberada.");
-                });
+                dialog.dismiss();
+                setBetaUnlocked(false);
+                setStatus("Cadastro enviado. Aguarde aprovação remota do responsável.");
             });
         });
 
@@ -2634,6 +2641,7 @@ public class MainActivity extends Activity implements LifecycleOwner {
                 payload.put("price_cents", requestedPlan.contains("119") ? 11900 : 0);
                 payload.put("source", "app_beta_area");
                 payload.put("device_id", installationId());
+                payload.put("stable_device_id", stableDeviceId());
                 payload.put("device_model", Build.MANUFACTURER + " " + Build.MODEL);
                 payload.put("android_version", Build.VERSION.RELEASE);
                 payload.put("password_hash", phoneOnly ? "" : sha256(password));
@@ -2660,6 +2668,7 @@ public class MainActivity extends Activity implements LifecycleOwner {
                 payload.put("amount_cents", 2000);
                 payload.put("source", "app_beta_area");
                 payload.put("device_id", installationId());
+                payload.put("stable_device_id", stableDeviceId());
                 payload.put("notes", "Checkout seguro do cliente via backend. Nenhuma credencial da Cora no app.");
                 postSupabaseRpc(SUPABASE_RPC_CREATE_CORA_CHECKOUT, payload);
             } catch (Exception e) {
@@ -2684,6 +2693,7 @@ public class MainActivity extends Activity implements LifecycleOwner {
                 payload.put("relationship", relationship);
                 payload.put("requested_plan", requestedPlan);
                 payload.put("device_id", installationId());
+                payload.put("stable_device_id", stableDeviceId());
                 payload.put("device_model", Build.MANUFACTURER + " " + Build.MODEL);
                 payload.put("android_version", Build.VERSION.RELEASE);
                 postSupabaseRpc(SUPABASE_RPC_NOTIFY_BETA_ACCESS, payload);
@@ -2699,14 +2709,14 @@ public class MainActivity extends Activity implements LifecycleOwner {
             try {
                 JSONObject payload = new JSONObject();
                 payload.put("device_id", installationId());
+                payload.put("stable_device_id", stableDeviceId());
                 JSONObject response = new JSONObject(postSupabaseRpcForText(SUPABASE_RPC_CHECK_BETA_ACCESS, payload));
                 if (response.optBoolean("approved", false) && !isBetaUnlocked()) {
                     runOnUiThread(() -> {
                         setBetaUnlocked(true);
                         setStatus("Acesso às integrações liberado pelo vendedor.");
                     });
-                } else if (("blocked".equalsIgnoreCase(response.optString("status"))
-                        || "revoked".equalsIgnoreCase(response.optString("status"))) && isBetaUnlocked()) {
+                } else if (!response.optBoolean("approved", false) && isBetaUnlocked()) {
                     runOnUiThread(() -> {
                         setBetaUnlocked(false);
                         setStatus("Acesso às integrações bloqueado remotamente. Fale com o responsável.");
@@ -4473,6 +4483,11 @@ public class MainActivity extends Activity implements LifecycleOwner {
         return created;
     }
 
+    private String stableDeviceId() {
+        String androidId = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
+        return sha256((androidId == null ? "unknown" : androidId) + ":" + getPackageName());
+    }
+
     private String androidIdHash() {
         try {
             String androidId = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
@@ -5704,16 +5719,24 @@ public class MainActivity extends Activity implements LifecycleOwner {
     }
 
     private void showTraceabilitySettingsDialog() {
+        LinearLayout form = new LinearLayout(this);
+        form.setOrientation(LinearLayout.VERTICAL);
         EditText addressEdit = new EditText(this);
         addressEdit.setSingleLine(false);
         addressEdit.setHint("Endereco de origem");
         addressEdit.setText(currentPadariaAddress());
         styleInput(addressEdit);
 
+        form.addView(field("Endereco de origem", addressEdit), fullWidth(-2));
+        Button calibrateP2 = new Button(this);
+        calibrateP2.setText("Definir minha localização atual como P2");
+        calibrateP2.setOnClickListener(v -> calibrateP2Location());
+        form.addView(calibrateP2, fullWidth(dp(52)));
+
         new AlertDialog.Builder(this)
                 .setTitle("Ajustes da rastreabilidade")
                 .setMessage("Defina o endereco de origem que sera impresso nos lotes da peixaria. Destino nao e preenchido.")
-                .setView(field("Endereco de origem", addressEdit))
+                .setView(form)
                 .setNegativeButton("Cancelar", null)
                 .setPositiveButton("Salvar", (dialog, which) -> {
                     String value = addressEdit.getText().toString().trim();
@@ -5723,6 +5746,56 @@ public class MainActivity extends Activity implements LifecycleOwner {
                     setStatus("Endereco de origem atualizado.");
                 })
                 .show();
+    }
+
+    @SuppressLint("MissingPermission")
+    private Location bestLastLocation() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
+                && checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            return null;
+        }
+        LocationManager manager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        Location best = null;
+        for (String provider : Arrays.asList(LocationManager.GPS_PROVIDER, LocationManager.NETWORK_PROVIDER)) {
+            try {
+                Location candidate = manager.getLastKnownLocation(provider);
+                if (candidate != null && (best == null || candidate.getAccuracy() < best.getAccuracy())) best = candidate;
+            } catch (Exception ignored) { }
+        }
+        return best;
+    }
+
+    private void calibrateP2Location() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
+                && checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_BLUETOOTH_CONNECT);
+            setStatus("Autorize a localização e toque novamente para definir o P2.");
+            return;
+        }
+        Location location = bestLastLocation();
+        if (location == null || location.getAccuracy() > 20f) {
+            setStatus("Localização insuficiente. Vá até o P2, ative o GPS e tente novamente.");
+            return;
+        }
+        prefs().edit().putLong(PREF_P2_LATITUDE, Double.doubleToRawLongBits(location.getLatitude()))
+                .putLong(PREF_P2_LONGITUDE, Double.doubleToRawLongBits(location.getLongitude())).apply();
+        setStatus("P2 calibrado com precisão aproximada de " + Math.round(location.getAccuracy()) + " m.");
+        autoSelectP2FromLocation();
+    }
+
+    private void autoSelectP2FromLocation() {
+        if (!prefs().contains(PREF_P2_LATITUDE) || !prefs().contains(PREF_P2_LONGITUDE)) return;
+        Location current = bestLastLocation();
+        if (current == null || current.getAccuracy() > 20f) return;
+        Location p2 = new Location("p2");
+        p2.setLatitude(Double.longBitsToDouble(prefs().getLong(PREF_P2_LATITUDE, 0L)));
+        p2.setLongitude(Double.longBitsToDouble(prefs().getLong(PREF_P2_LONGITUDE, 0L)));
+        if (current.distanceTo(p2) <= P2_AUTO_RADIUS_METERS) {
+            prefs().edit().putString(PREF_ACTIVE_ESTABLISHMENT_SLUG, P2_ESTABLISHMENT_SLUG)
+                    .putString(PREF_PADARIA_ADDRESS, "Av. Dr. Arthur da Costa Filho, 311 - Centro, Caraguatatuba - SP")
+                    .apply();
+            setStatus("Estabelecimento alterado automaticamente para P2.");
+        }
     }
 
     private void showCreateEstablishmentDialog() {
