@@ -172,6 +172,7 @@ public class MainActivity extends Activity implements LifecycleOwner {
     private static final String SUPABASE_RPC_CREATE_ESTABLISHMENT = "lobo_pro_create_establishment";
     private static final String SUPABASE_RPC_REGISTER_BETA_ACCESS = "lobo_pro_register_beta_access";
     private static final String SUPABASE_RPC_NOTIFY_BETA_ACCESS = "lobo_pro_notify_beta_access";
+    private static final String SUPABASE_RPC_CHECK_BETA_ACCESS = "lobo_pro_check_beta_access";
     private static final String SUPABASE_RPC_CREATE_CORA_CHECKOUT = "lobo_pro_create_cora_checkout";
     private static final String BETA_LOGIN = "lobo";
     private static final String BETA_PASSWORD = "lobopt260";
@@ -580,9 +581,11 @@ public class MainActivity extends Activity implements LifecycleOwner {
         checkForUpdates(false);
         handleOpenAlertsIntent(getIntent());
         refreshSupabaseConfigAsync();
+        checkBetaAccessApprovalAsync();
         syncDeviceRegistrationAsync();
         syncPendingPrintHistoryAsync();
         syncPadariaHistoryAsync();
+        checkBetaAccessApprovalAsync();
     }
 
     @Override
@@ -2686,6 +2689,25 @@ public class MainActivity extends Activity implements LifecycleOwner {
                 postSupabaseRpc(SUPABASE_RPC_NOTIFY_BETA_ACCESS, payload);
             } catch (Exception e) {
                 Log.w(TAG, "Falha ao notificar acesso beta privado", e);
+            }
+        }).start();
+    }
+
+    private void checkBetaAccessApprovalAsync() {
+        if (!isSupabaseConfigured()) return;
+        new Thread(() -> {
+            try {
+                JSONObject payload = new JSONObject();
+                payload.put("device_id", installationId());
+                JSONObject response = new JSONObject(postSupabaseRpcForText(SUPABASE_RPC_CHECK_BETA_ACCESS, payload));
+                if (response.optBoolean("approved", false) && !isBetaUnlocked()) {
+                    runOnUiThread(() -> {
+                        setBetaUnlocked(true);
+                        setStatus("Acesso às integrações liberado pelo vendedor.");
+                    });
+                }
+            } catch (Exception e) {
+                Log.w(TAG, "Falha ao consultar aprovação beta", e);
             }
         }).start();
     }
