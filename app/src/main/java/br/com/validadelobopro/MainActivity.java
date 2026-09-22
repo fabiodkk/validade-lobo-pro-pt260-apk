@@ -851,8 +851,6 @@ public class MainActivity extends Activity implements LifecycleOwner {
                 updateProdutosSpinnerPorSetor();
             }
         });
-        validityPage.addView(field("Setor (Categoria)", setorSpinner), fullWidth(-2));
-
         produtoSpinner = new Spinner(this);
         produtoAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, produtos);
         produtoAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -870,7 +868,14 @@ public class MainActivity extends Activity implements LifecycleOwner {
                 }
             }
         });
-        validityPage.addView(field("Lista pronta", produtoSpinner), fullWidth(-2));
+        LinearLayout sectorProductRow = new LinearLayout(this);
+        sectorProductRow.setOrientation(LinearLayout.HORIZONTAL);
+        sectorProductRow.setGravity(Gravity.TOP);
+        sectorProductRow.addView(field("Setor", setorSpinner),
+                new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1));
+        sectorProductRow.addView(field("Lista pronta", produtoSpinner),
+                new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1));
+        validityPage.addView(sectorProductRow, fullWidth(-2));
 
         produtoEdit = new EditText(this);
         produtoEdit.setSingleLine(true);
@@ -883,13 +888,18 @@ public class MainActivity extends Activity implements LifecycleOwner {
         dataEdit.setSingleLine(true);
         dataEdit.setFocusable(false);
         dataEdit.setOnClickListener(v -> openDatePicker());
-        validityPage.addView(field("Fabricacao / abertura", dataEdit), fullWidth(-2));
-
         validadeEdit = new EditText(this);
         validadeEdit.setSingleLine(true);
         validadeEdit.setFocusable(false);
         validadeEdit.setEnabled(false);
-        validityPage.addView(field("Validade automatica", validadeEdit), fullWidth(-2));
+        LinearLayout validityDatesRow = new LinearLayout(this);
+        validityDatesRow.setOrientation(LinearLayout.HORIZONTAL);
+        validityDatesRow.setGravity(Gravity.TOP);
+        validityDatesRow.addView(field("Fabricação / abertura", dataEdit),
+                new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1));
+        validityDatesRow.addView(field("Validade automática", validadeEdit),
+                new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1));
+        validityPage.addView(validityDatesRow, fullWidth(-2));
 
         validadeManualEdit = new EditText(this);
         validadeManualEdit.setSingleLine(true);
@@ -897,10 +907,15 @@ public class MainActivity extends Activity implements LifecycleOwner {
         validityPage.addView(field("Validade manual", validadeManualEdit), fullWidth(-2));
 
         copiasEdit = createCopiesEdit();
-        validityPage.addView(field("Copias", copiasEdit), fullWidth(-2));
-
         fontSizeSpinner = createFontSizeSpinner();
-        validityPage.addView(field("Tamanho letras", fontSizeSpinner), fullWidth(-2));
+        LinearLayout copiesFontRow = new LinearLayout(this);
+        copiesFontRow.setOrientation(LinearLayout.HORIZONTAL);
+        copiesFontRow.setGravity(Gravity.TOP);
+        copiesFontRow.addView(field("Cópias", copiasEdit),
+                new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1));
+        copiesFontRow.addView(field("Tamanho das letras", fontSizeSpinner),
+                new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1));
+        validityPage.addView(copiesFontRow, fullWidth(-2));
 
         var validityImageActions = new LinearLayout(this);
         validityImageActions.setOrientation(LinearLayout.HORIZONTAL);
