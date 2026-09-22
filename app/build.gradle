@@ -27,8 +27,8 @@ android {
     defaultConfig {
         minSdk 23
         targetSdk 36
-        versionCode 48
-        versionName "1.22.5"
+        versionCode 49
+        versionName "1.22.6"
 
         buildConfigField "String", "SUPABASE_URL", "\"${javaString(supabaseProperties.getProperty("SUPABASE_URL", ""))}\""
         buildConfigField "String", "SUPABASE_ANON_KEY", "\"${javaString(supabaseProperties.getProperty("SUPABASE_ANON_KEY", ""))}\""

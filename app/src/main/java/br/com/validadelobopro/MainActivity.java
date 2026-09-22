@@ -2302,6 +2302,29 @@ public class MainActivity extends Activity implements LifecycleOwner {
         styleInput(phoneEdit);
         form.addView(field("Telefone", phoneEdit), fullWidth(-2));
 
+        Spinner relationshipSpinner = new Spinner(this);
+        ArrayAdapter<String> relationshipAdapter = new ArrayAdapter<>(this,
+                android.R.layout.simple_spinner_item,
+                new String[]{
+                        "Funcionário de estabelecimento assinante",
+                        "Representante de estabelecimento interessado"
+                });
+        relationshipAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        relationshipSpinner.setAdapter(relationshipAdapter);
+        form.addView(field("Quem está solicitando", relationshipSpinner), fullWidth(-2));
+
+        Spinner planSpinner = new Spinner(this);
+        ArrayAdapter<String> planAdapter = new ArrayAdapter<>(this,
+                android.R.layout.simple_spinner_item,
+                new String[]{
+                        "Plano básico mensal — R$ 119",
+                        "Plano anual completo",
+                        "Outro plano / quero conversar"
+                });
+        planAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        planSpinner.setAdapter(planAdapter);
+        form.addView(field("Plano ou vínculo", planSpinner), fullWidth(-2));
+
         EditText passwordEdit = new EditText(this);
         passwordEdit.setSingleLine(true);
         passwordEdit.setHint("Senha opcional");
@@ -2355,6 +2378,8 @@ public class MainActivity extends Activity implements LifecycleOwner {
                 String password = passwordEdit.getText().toString().trim();
                 boolean phoneOnly = phoneOnlyCheckBox.isChecked() || password.isEmpty();
                 boolean testMode = testModeCheckBox.isChecked();
+                String relationship = String.valueOf(relationshipSpinner.getSelectedItem());
+                String requestedPlan = String.valueOf(planSpinner.getSelectedItem());
 
                 if (name.isEmpty()) {
                     status.setText("Informe o nome do usuário.");
@@ -2385,13 +2410,18 @@ public class MainActivity extends Activity implements LifecycleOwner {
                         .apply();
 
                 if (testMode) {
-                    syncBetaAccessProfileToSupabase(name, phone, phoneOnly ? "" : password, phoneOnly, "pix_test");
-                    notifyBetaAccessPrivateMessage(name, phone, "Acesso beta liberado em modo de teste para " + name + ". Sem cobrança real. Login: " + phone + ".");
+                    syncBetaAccessProfileToSupabase(name, phone, phoneOnly ? "" : password, phoneOnly,
+                            "test", relationship, requestedPlan);
+                    notifyBetaAccessPrivateMessage(name, phone,
+                            "Cadastro de teste recebido.", relationship, requestedPlan);
                     status.setText("Teste liberado para " + name + ". Sem cobrança real.");
                 } else {
-                    syncBetaAccessProfileToSupabase(name, phone, phoneOnly ? "" : password, phoneOnly, "pix");
-                    status.setText("Solicitação Pix de R$ 20,00 enviada. Aguarde o QR e a confirmação do pagamento.");
-                    setStatus("Acesso pago aguardando confirmação segura do Pix.");
+                    syncBetaAccessProfileToSupabase(name, phone, phoneOnly ? "" : password, phoneOnly,
+                            "plan_request", relationship, requestedPlan);
+                    notifyBetaAccessPrivateMessage(name, phone,
+                            "Solicitação de plano recebida.", relationship, requestedPlan);
+                    status.setText("Solicitação enviada. O robô DDD 12 enviará o menu de confirmação no WhatsApp.");
+                    setStatus("Cadastro enviado para confirmação pelo WhatsApp.");
                     return;
                 }
                 animateCredentialSuccess(new ArrayList<>(), new ArrayList<>(), () -> {
@@ -2569,7 +2599,8 @@ public class MainActivity extends Activity implements LifecycleOwner {
         return digits;
     }
 
-    private void syncBetaAccessProfileToSupabase(String name, String phone, String password, boolean phoneOnly, String paymentMethod) {
+    private void syncBetaAccessProfileToSupabase(String name, String phone, String password, boolean phoneOnly,
+                                                 String paymentMethod, String relationship, String requestedPlan) {
         if (!isSupabaseConfigured()) {
             return;
         }
@@ -2584,15 +2615,14 @@ public class MainActivity extends Activity implements LifecycleOwner {
                 // acontece depois de o backend receber e validar o pagamento.
                 payload.put("paid_access", false);
                 payload.put("payment_method", paymentMethod);
+                payload.put("relationship", relationship);
+                payload.put("requested_plan", requestedPlan);
                 payload.put("invoice_type", "none");
-                payload.put("price_cents", "pix_test".equals(paymentMethod) ? 0 : 2000);
+                payload.put("price_cents", requestedPlan.contains("119") ? 11900 : 0);
                 payload.put("source", "app_beta_area");
                 payload.put("device_id", installationId());
                 payload.put("password_hash", phoneOnly ? "" : sha256(password));
                 postSupabaseRpc(SUPABASE_RPC_REGISTER_BETA_ACCESS, payload);
-                if (!"pix_test".equals(paymentMethod)) {
-                    triggerSecureCoraCheckout(name, phone, paymentMethod);
-                }
             } catch (Exception e) {
                 Log.w(TAG, "Falha ao registrar beta access no Supabase", e);
             }
@@ -2623,7 +2653,8 @@ public class MainActivity extends Activity implements LifecycleOwner {
         }).start();
     }
 
-    private void notifyBetaAccessPrivateMessage(String name, String phone, String message) {
+    private void notifyBetaAccessPrivateMessage(String name, String phone, String message,
+                                                String relationship, String requestedPlan) {
         if (!isSupabaseConfigured()) {
             return;
         }
@@ -2635,6 +2666,8 @@ public class MainActivity extends Activity implements LifecycleOwner {
                 payload.put("message", message);
                 payload.put("channel", "private_whatsapp");
                 payload.put("payment_method", "pix_test");
+                payload.put("relationship", relationship);
+                payload.put("requested_plan", requestedPlan);
                 postSupabaseRpc(SUPABASE_RPC_NOTIFY_BETA_ACCESS, payload);
             } catch (Exception e) {
                 Log.w(TAG, "Falha ao notificar acesso beta privado", e);
@@ -3674,7 +3707,7 @@ public class MainActivity extends Activity implements LifecycleOwner {
         }
         new AlertDialog.Builder(this)
                 .setTitle("Versão oficial liberada")
-                .setMessage("Esta versão foi liberada pelo responsável do sistema, Alex Fabio Curiel da Silva.\n\nA função Validade continua gratuita. Recursos de integração empresarial somente são ativados após confirmação clara do responsável e do pagamento correspondente.")
+                .setMessage("Esta versão foi liberada pelo responsável do sistema, A.Fabio.C.Silva.\n\nA função Validade continua gratuita. Recursos de integração empresarial somente são ativados após confirmação clara do responsável e do pagamento correspondente.")
                 .setPositiveButton("Entendi", (dialog, which) -> prefs().edit()
                         .putInt(PREF_RELEASE_NOTICE_VERSION, BuildConfig.VERSION_CODE)
                         .apply())
