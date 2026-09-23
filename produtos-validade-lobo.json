@@ -1,39 +1,1496 @@
 {
-  "version": 1,
-  "products": [
-    "Pao frances",
-    "Pao de sal",
-    "Pao de leite",
-    "Pao integral",
-    "Pao de forma",
-    "Pao de queijo",
-    "Pao doce",
-    "Bisnaga",
-    "Sonho",
-    "Rosca",
-    "Bolo simples",
-    "Bolo de chocolate",
-    "Salgado assado"
-  ],
+  "version": 4,
   "rules": [
+    {
+      "match": "pimenta",
+      "validityDays": 90,
+      "startLabel": "Aberto"
+    },
+    {
+      "match": "mousse pudim",
+      "validityDays": 5,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "pudim",
+      "validityDays": 7,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "quiche",
+      "validityDays": 3,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "recheio de pastel",
+      "validityDays": 90,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "bife ancho",
+      "validityDays": 90,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "mandioca",
+      "validityDays": 90,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "berinjela",
+      "validityDays": 90,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "carne de yakssoba",
+      "validityDays": 90,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "file mignon",
+      "validityDays": 90,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "Pizza",
+      "startLabel": "Fab",
+      "validityDays": 90
+    },
+    {
+      "match": "salgado",
+      "validityHours": 6,
+      "startLabel": "Pronto"
+    },
+    {
+      "match": "coxinha",
+      "validityHours": 6,
+      "startLabel": "Pronto"
+    },
+    {
+      "match": "bolinho",
+      "validityHours": 6,
+      "startLabel": "Pronto"
+    },
+    {
+      "match": "bolinha",
+      "validityHours": 6,
+      "startLabel": "Pronto"
+    },
+    {
+      "match": "kibe",
+      "validityHours": 6,
+      "startLabel": "Pronto"
+    },
+    {
+      "match": "quibe",
+      "validityHours": 6,
+      "startLabel": "Pronto"
+    },
+    {
+      "match": "risole",
+      "validityHours": 6,
+      "startLabel": "Pronto"
+    },
+    {
+      "match": "empada",
+      "validityHours": 6,
+      "startLabel": "Pronto"
+    },
+    {
+      "match": "esfiha",
+      "validityHours": 6,
+      "startLabel": "Pronto"
+    },
+    {
+      "match": "enroladinho",
+      "validityHours": 6,
+      "startLabel": "Pronto"
+    },
+    {
+      "match": "pastel",
+      "validityHours": 6,
+      "startLabel": "Pronto"
+    },
+    {
+      "match": "croquete",
+      "validityHours": 6,
+      "startLabel": "Pronto"
+    },
+    {
+      "match": "quiche de brócolis brócolis com bacon",
+      "validityDays": 3,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "alho IZABEL",
+      "validityDays": 6,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "alho triturado",
+      "validityDays": 6,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "Bolo chocolate",
+      "validityDays": 5,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "ARROZ DE POLVO",
+      "validityDays": 4,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "MACARRÃO TALHARIM",
+      "validityDays": 4,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "mussarela fatiada 50 und",
+      "validityDays": 6,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "CARNE YAKISOBA",
+      "validityDays": 90,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "CHORIZO CABANãS",
+      "validityDays": 90,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "Frango strogonoff",
+      "validityDays": 90,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "Frango Yakissoba",
+      "validityDays": 90,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "SALMAO",
+      "validityDays": 90,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "yakissoba",
+      "validityDays": 90,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "azeite",
+      "validityDays": 90,
+      "startLabel": "Aberto"
+    },
+    {
+      "match": "Bacon",
+      "validityDays": 90,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "Torta Limao",
+      "startLabel": "Fab",
+      "validityDays": 5
+    },
+    {
+      "match": "RABO DE PORCO",
+      "validityDays": 3,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "calabresa",
+      "validityDays": 90,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "Calda maracujá",
+      "validityDays": 3,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "feijao",
+      "validityDays": 3,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "frango",
+      "validityDays": 30,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "molho camarao",
+      "validityDays": 3,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "molho maracuja",
+      "validityDays": 3,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "molho tomate",
+      "validityDays": 3,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "ORELHA DE PORCO",
+      "validityDays": 3,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "PE DE PORCO",
+      "validityDays": 3,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "pirao",
+      "validityDays": 3,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "purê abobora",
+      "validityDays": 3,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "purê batata",
+      "validityDays": 3,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "Fatia de pizza estufa 70C",
+      "validityDays": 5,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "Salgados congelados",
+      "validityDays": 5,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "Fatia de pizza congelada",
+      "validityDays": 5,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "Kibe congelado",
+      "validityDays": 5,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "Coxinha congelada",
+      "validityDays": 5,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "agrega",
+      "validityDays": 4,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "ancho",
+      "validityDays": 4,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "azeitona",
+      "validityDays": 4,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "Bacalhau",
+      "startLabel": "Fab",
+      "validityDays": 4
+    },
+    {
+      "match": "Bife Ancho 92",
+      "validityDays": 90,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "Brocolis",
+      "startLabel": "Fab",
+      "validityDays": 4
+    },
+    {
+      "match": "carreteiro",
+      "validityDays": 4,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "vinagrete",
+      "validityDays": 4,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "ovo",
+      "validityDays": 4,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "Ketchup",
+      "validityDays": 4,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "mostarda",
+      "validityDays": 4,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "Gelatina MOZAICO",
+      "validityDays": 5,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "mussarela fatiada",
+      "validityDays": 4,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "mussarela ralada",
+      "validityDays": 4,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "talharim",
+      "validityDays": 4,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "tainha",
+      "validityDays": 4,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "polvo",
+      "validityDays": 4,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "congelado",
+      "validityDays": 3,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "Laranja Fatiada uso diario",
+      "startLabel": "Manipulado",
+      "validityDays": 365
+    },
+    {
+      "match": "SALSICHA",
+      "validityDays": 90,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "TOSCANA",
+      "validityDays": 90,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "TOICINHO",
+      "validityDays": 90,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "arroz brocolis",
+      "validityDays": 3,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "FRANGO PASSARINHO",
+      "validityDays": 90,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "PATINHO BOV",
+      "validityDays": 90,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "SALSISHA",
+      "validityDays": 90,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "OVO COZIDO",
+      "validityDays": 4,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "Limao Fatiado uso diario",
+      "startLabel": "Manipulado",
+      "validityDays": 365
+    },
+    {
+      "match": "Limão fatiado",
+      "startLabel": "Manipulado",
+      "validityDays": 365
+    },
+    {
+      "match": "arroz carreteiro",
+      "validityDays": 3,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "Cevite",
+      "validityDays": 4,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "Doce Tapioca côco",
+      "validityDays": 5,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "CHORIZO 92",
+      "validityDays": 90,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "Yakisoba carne",
+      "validityDays": 90,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "mussarela 50 fatias",
+      "validityDays": 30,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "Marula maracujá Após aberto",
+      "startLabel": "Aberto",
+      "validityDays": 310
+    },
+    {
+      "match": "COSTELA",
+      "validityDays": 90,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "Risole carne seca 3 por R$10,00",
+      "validityDays": 1,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "Limão Espremido uso diario",
+      "validityDays": 365,
+      "startLabel": "Manipulado"
+    },
+    {
+      "match": "Limão uso diario",
+      "validityDays": 365,
+      "startLabel": "Manipulado"
+    },
+    {
+      "match": "Bife milanesa",
+      "validityDays": 90,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "ancho 92",
+      "validityDays": 4,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "Bolo de Cenoura",
+      "validityDays": 5,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "Carne Moida",
+      "validityDays": 90,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "FIle de frango",
+      "validityDays": 90,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "Filé Tainha",
+      "validityDays": 90,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "Frango a passarinho",
+      "validityDays": 90,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "Isca de frango",
+      "validityDays": 90,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "Torta argentina",
+      "validityDays": 5,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "Molho de camarão",
+      "startLabel": "Fab",
+      "validityDays": 6
+    },
+    {
+      "match": "molho de maracujá",
+      "validityDays": 6,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "Arroz a Grega",
+      "validityDays": 3,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "Arroz Polvo",
+      "validityDays": 3,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "legumes",
+      "validityDays": 3,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "Molho Vermelho",
+      "validityDays": 6,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "Pastel Belém doce Refrigerado",
+      "validityDays": 3,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "Purê",
+      "validityDays": 6,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "mussarela",
+      "validityDays": 3,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "abobora",
+      "validityDays": 3,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "arroz cremoso",
+      "validityDays": 3,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "batata sote",
+      "validityDays": 3,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "belle",
+      "validityDays": 3,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "Bisteca",
+      "validityDays": 3,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "BOBó",
+      "startLabel": "Fab",
+      "validityDays": 3
+    },
+    {
+      "match": "camarao",
+      "validityDays": 3,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "coracao",
+      "validityDays": 3,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "couve",
+      "validityDays": 3,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "Feijoada",
+      "validityDays": 90,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "linguiça",
+      "validityDays": 3,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "Moqueca",
+      "validityDays": 3,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "Queijo 30F",
+      "validityDays": 5,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "Queijo 50F",
+      "validityDays": 5,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "Queijo pedaço",
+      "validityDays": 5,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "strogonoff camarao",
+      "startLabel": "Fab",
+      "validityDays": 3
+    },
+    {
+      "match": "strogonoff frango",
+      "validityDays": 3,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "Alcaparras",
+      "validityDays": 3,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "Bolo Cenoura",
+      "validityDays": 5,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "Alho",
+      "validityDays": 3,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "Carne",
+      "validityDays": 3,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "Carne pimentao",
+      "validityDays": 3,
+      "startLabel": "Aberto"
+    },
+    {
+      "match": "carne seca",
+      "validityDays": 90,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "cenoura",
+      "validityDays": 3,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "Champignon",
+      "validityDays": 3,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "coxa da asa",
+      "validityDays": 3,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "Coxa S Coxa",
+      "validityDays": 3,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "Frutos do Mar",
+      "validityDays": 3,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "Kafta",
+      "validityDays": 3,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "Linguado",
+      "validityDays": 3,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "Picanha",
+      "validityDays": 3,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "Margarina",
+      "validityDays": 3,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "Mignon",
+      "validityDays": 3,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "Misto",
+      "validityDays": 3,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "Tulipa",
+      "validityDays": 3,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "Costela salgada",
+      "validityDays": 90,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "Abacaxi",
+      "validityDays": 3,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "batata bacalhau",
+      "validityDays": 3,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "filé frango",
+      "validityDays": 90,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "almôndegas",
+      "validityDays": 4,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "Banofe",
+      "validityDays": 5,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "Mousse goiaba/frutas vermelhas",
+      "validityDays": 5,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "Macarrao",
+      "validityDays": 4,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "Bolo ninho",
+      "startLabel": "Fab",
+      "validityDays": 5
+    },
+    {
+      "match": "Tentacao",
+      "validityDays": 5,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "Mousse ninho c/ avela",
+      "validityDays": 5,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "CALDO CALABRESA",
+      "validityDays": 60,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "caldo camarão",
+      "validityDays": 60,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "caldo feijão",
+      "validityDays": 60,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "caldo quenga",
+      "validityDays": 60,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "caldo verde",
+      "validityDays": 60,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "Mousse Tentacao",
+      "validityDays": 5,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "M/ maracuja",
+      "validityDays": 5,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "LAGARTO",
+      "validityDays": 60,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "Avela",
+      "validityDays": 5,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "Torta de Avela",
+      "validityDays": 5,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "MAMINHA",
+      "validityDays": 60,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "CUPIM",
+      "validityDays": 60,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "MOZAICO",
+      "validityDays": 5,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "ATUM",
+      "validityDays": 30,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "Isca de Cacao",
+      "validityDays": 60,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "MANJAR",
+      "validityDays": 5,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "MANJUBA",
+      "validityDays": 90,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "Mous/ maracuja",
+      "validityDays": 5,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "Mous/ Pessego",
+      "validityDays": 5,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "Presunto",
+      "validityDays": 30,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "TRILHA",
+      "validityDays": 90,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "Bolo brigadeiro",
+      "validityDays": 5,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "Bolo Nutela",
+      "validityDays": 5,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "CARNE YAKI",
+      "validityDays": 31,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "Hambúrguer",
+      "validityDays": 90,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "chocolate branco",
+      "validityDays": 3,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "palmito",
+      "validityDays": 3,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "Pudim Chocolate",
+      "validityDays": 7,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "Torta goiaba",
+      "validityDays": 5,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "Torta Uva",
+      "validityDays": 3,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "Bolo Ninho Nutela",
+      "validityDays": 5,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "Dendê",
+      "validityDays": 30,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "Mandioquinha",
+      "validityDays": 31,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "Bolo chocolate branco",
+      "validityDays": 5,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "Bolo Ninho Avela",
+      "validityDays": 5,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "Brownie",
+      "validityDays": 5,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "Cural",
+      "validityDays": 5,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "FILE DE LINGUADO",
+      "validityDays": 3,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "GENGIBRE",
+      "validityDays": 3,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "MOLHO AMARELO",
+      "validityDays": 3,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "MOLHO VERDE",
+      "validityDays": 3,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "Queijo",
+      "validityDays": 3,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "BRIGADEIRAO",
+      "validityDays": 5,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "Brownie ChocoBranco",
+      "validityDays": 5,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "Brownie Chocolate",
+      "validityDays": 5,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "Brownie Chocolate/Branco",
+      "validityDays": 5,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "Brownie Doce Leite",
+      "validityDays": 5,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "CONTRA FILE",
+      "validityDays": 90,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "GUIOZA BOVINO",
+      "validityDays": 90,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "GUIOZA SUINO",
+      "validityDays": 90,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "Torta Avela",
+      "validityDays": 5,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "Torta Banofe",
+      "validityDays": 5,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "Torta Maçã",
+      "validityDays": 5,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "Bomba de Chocolate",
+      "validityDays": 3,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "BOMBA DE CHOC",
+      "validityDays": 5,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "BROWNIE c/ Choc Branco",
+      "validityDays": 5,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "MOUSSE DE MARACUJÁ",
+      "validityDays": 5,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "CAROLINA",
+      "validityDays": 5,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "BROWNIE c/Avela",
+      "validityDays": 5,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "BROWNIE D.Leite",
+      "validityDays": 5,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "Batata Palito",
+      "validityDays": 30,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "BROWNIE de Chocolate Branco",
+      "validityDays": 3,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "caldo camarão/abóbora",
+      "validityDays": 30,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "CAMARÃO MOLHO",
+      "validityDays": 3,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "Carne de Yakisoba",
+      "validityDays": 30,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "CARNE MOIDA FRACIONADA",
+      "validityDays": 30,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "couve flor",
+      "validityDays": 30,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "Torta Ninho",
+      "validityDays": 5,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "Torta Morango",
+      "validityDays": 5,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "Mix Yakissoba",
+      "validityDays": 7,
+      "startLabel": "Fab"
+    },
+    {
+      "match": "Banoffe",
+      "validityDays": 6,
+      "startLabel": "Fab"
+    },
     {
       "match": "*",
       "validityDays": 5,
-      "startLabel": "Fab",
-      "validityLabel": "Val"
+      "startLabel": "Fab"
+    },
+    {
+      "startLabel": "Fabricado",
+      "validityDays": 5,
+      "match": "morangos do amor"
+    },
+    {
+      "startLabel": "Fabricado",
+      "validityDays": 5,
+      "match": "morango cravejado"
     }
-  ]
-}{
-  "version": 1,
-  "rules": [
-    { "match": "pao", "validityHours": 24, "startLabel": "Fabricado" },
-    { "match": "pao frances", "validityHours": 24, "startLabel": "Fabricado" },
-    { "match": "pao de queijo", "validityHours": 24, "startLabel": "Fabricado" },
-    { "match": "bolo", "validityDays": 5, "startLabel": "Fabricado" },
-    { "match": "salgado", "validityHours": 6, "startLabel": "Pronto" },
-    { "match": "pizza", "validityDays": 5, "startLabel": "Fabricado" }
   ],
   "products": [
+    "Fatia de pizza estufa 70C",
+    "Pizza mussarela fatia",
+    "Pizza calabresa fatia",
+    "Pizza frango catupiry fatia",
+    "Salgados estufa 70C",
+    "Salgados congelados",
+    "Fatia de pizza congelada",
+    "Coxinha congelada",
+    "Bolinho de carne congelado",
+    "Kibe congelado",
+    "Quibe congelado",
+    "Bolinha de queijo congelada",
+    "Risole congelado",
+    "Croquete congelado",
+    "Empada congelada",
+    "Esfiha congelada",
+    "Enroladinho de salsicha congelado",
+    "Quiche congelada",
+    "Quiche de brocolis com bacon",
+    "Coxinha",
+    "Bolinho de carne",
+    "Kibe",
+    "Quibe",
+    "Bolinho de pernil",
+    "Bolinha de queijo",
+    "Risole",
+    "Croquete",
+    "Empada",
+    "Esfiha",
+    "Enroladinho de salsicha",
+    "Pastel assado",
+    "Pimenta apos aberta",
+    "Azeite apos aberto",
+    "Mousse morango",
+    "Mousse goiaba",
+    "Pudim",
+    "Mousse ninho",
+    "Creme de leite / ninho",
+    "Gelatina mosaica",
+    "Creme de abacaxi",
+    "Mousse abacaxi",
+    "Mousse amora",
+    "Mousse limao",
+    "Mousse abacaxi/coco",
+    "Mousse chocolate/creme",
+    "Torta maracuja",
+    "Pave argentina",
+    "Bolo",
+    "Brigadeiro",
+    "Mousse coco",
+    "Doce de leite",
+    "Chocolate c/ ninho",
+    "Mousse maracuja",
+    "Mousse abacaxi c/ coco",
+    "Mousse pudim",
+    "Mousse chocolate",
+    "Mousse manga",
+    "Mousse uva",
+    "Mousse pessego",
+    "Mousse cupuacu",
+    "Mousse acai",
+    "Mousse leite ninho",
+    "Mousse ninho c/ morango",
+    "Mousse nutella",
+    "Mousse oreo",
+    "Mousse doce de leite",
+    "Mousse pacoca",
+    "Mousse brigadeiro",
+    "Mousse beijinho",
+    "Mousse leite condensado",
+    "Mousse ameixa",
+    "Mousse goiabada",
+    "Mousse banana",
+    "Mousse banana c/ canela",
+    "Mousse kiwi",
+    "Mousse frutas vermelhas",
+    "Mousse cereja",
+    "Mousse framboesa",
+    "Mousse mirtilo",
+    "Mousse tangerina",
+    "Mousse laranja",
+    "Mousse melancia",
+    "Mousse melao",
+    "Mousse cafe",
+    "Mousse capuccino",
+    "Mousse caramelo",
+    "Mousse chocolate branco",
+    "Mousse choc. meio amargo",
+    "Mousse alpino",
+    "Mousse sonho de valsa",
+    "Mousse ouro branco",
+    "Mousse ovomaltine",
+    "Mousse churros",
+    "Mousse coco queimado",
+    "Mousse tapioca",
+    "Mousse baunilha",
+    "Mousse pistache",
+    "Mousse amendoim",
+    "Bife ancho",
+    "Mandioca",
+    "Berinjela",
+    "Carne de yakssoba",
+    "File mignon",
+    "Recheio de pastel carne",
+    "Recheio de pastel frango",
+    "Recheio de pastel camarao",
+    "Recheio de pastel palmito",
+    "Recheio de pastel calabresa",
+    "Recheio de pastel pizza",
+    "quiche de brócolis brócolis com bacon",
+    "alho triturado",
+    "alho IZABEL",
+    "Bolo chocolate",
+    "ARROZ DE POLVO",
+    "MACARRÃO TALHARIM",
+    "mussarela fatiada 50 und",
+    "CARNE YAKISOBA",
+    "CHORIZO CABANãS",
+    "Frango strogonoff",
+    "Frango Yakissoba",
+    "SALMAO",
+    "yakissoba",
+    "Bacon",
+    "Torta Limao",
+    "RABO DE PORCO",
+    "calabresa",
+    "Calda maracujá",
+    "feijao",
+    "frango",
+    "molho camarao",
+    "molho maracuja",
+    "molho tomate",
+    "ORELHA DE PORCO",
+    "PE DE PORCO",
+    "pirao",
+    "purê abobora",
+    "purê batata",
+    "agrega",
+    "ancho",
+    "azeitona",
+    "Bacalhau",
+    "Bife Ancho 92",
+    "brocolis",
+    "carreteiro",
+    "vinagrete",
+    "ovo",
+    "Cevite",
+    "Ketchup",
+    "mostarda",
+    "Gelatina MOZAICO",
+    "mussarela fatiada",
+    "mussarela ralada",
+    "talharim",
+    "tainha",
+    "polvo",
+    "congelado",
+    "Laranja Fatiada uso diario",
+    "SALSICHA",
+    "TOSCANA",
+    "TOICINHO",
+    "arroz brocolis",
+    "FRANGO PASSARINHO",
+    "PATINHO BOV",
+    "SALSISHA",
+    "OVO COZIDO",
+    "Limao Fatiado uso diario",
+    "Limão fatiado",
+    "Limão Espremido uso diario",
+    "arroz carreteiro",
+    "Doce Tapioca côco",
+    "CHORIZO 92",
+    "Yakisoba carne",
+    "mussarela 50 fatias",
+    "Marula maracujá Após aberto",
+    "COSTELA",
+    "Risole carne seca 3 por R$10,00",
+    "Limão uso diario",
+    "Bife milanesa",
+    "ancho 92",
+    "Bolo de Cenoura",
+    "Carne Moida",
+    "FIle de frango",
+    "Filé Tainha",
+    "Frango a passarinho",
+    "Isca de frango",
+    "Torta argentina",
+    "Molho de camarão",
+    "molho de maracujá",
+    "Arroz a Grega",
+    "Arroz Polvo",
+    "legumes",
+    "Molho Vermelho",
+    "Pastel Belém doce Refrigerado",
+    "Purê",
+    "mussarela",
+    "abobora",
+    "arroz cremoso",
+    "batata sote",
+    "belle",
+    "Bisteca",
+    "Bobó",
+    "camarao",
+    "coracao",
+    "couve",
+    "Feijoada",
+    "linguiça",
+    "Moqueca",
+    "Queijo 30F",
+    "Queijo 50F",
+    "Queijo pedaço",
+    "strogonoff camarao",
+    "strogonoff frango",
+    "Alcaparras",
+    "Bolo Cenoura",
+    "Alho",
+    "Carne",
+    "Carne pimentao",
+    "carne seca",
+    "cenoura",
+    "Champignon",
+    "coxa da asa",
+    "Coxa S Coxa",
+    "Frutos do Mar",
+    "Kafta",
+    "Linguado",
+    "Picanha",
+    "Margarina",
+    "Mignon",
+    "Misto",
+    "Tulipa",
+    "Costela salgada",
+    "Abacaxi",
+    "batata bacalhau",
+    "filé frango",
+    "almôndegas",
+    "Banofe",
+    "Mousse goiaba/frutas vermelhas",
+    "Macarrao",
+    "Bolo Ninho",
+    "Tentacao",
+    "Mousse ninho c/ avela",
+    "CALDO CALABRESA",
+    "caldo camarão",
+    "caldo feijão",
+    "caldo quenga",
+    "caldo verde",
+    "Mousse Tentacao",
+    "M/ maracuja",
+    "LAGARTO",
+    "Avela",
+    "Torta de Avela",
+    "MAMINHA",
+    "CUPIM",
+    "MOZAICO",
+    "ATUM",
+    "Isca de Cacao",
+    "MANJAR",
+    "MANJUBA",
+    "Mous/ maracuja",
+    "Mous/ Pessego",
+    "Presunto",
+    "TRILHA",
+    "Bolo brigadeiro",
+    "Bolo Nutela",
+    "CARNE YAKI",
+    "Hambúrguer",
+    "chocolate branco",
+    "palmito",
+    "Pudim Chocolate",
+    "Torta goiaba",
+    "Torta Uva",
+    "Bolo Ninho Nutela",
+    "Dendê",
+    "Mandioquinha",
+    "Bolo chocolate branco",
+    "Bolo Ninho Avela",
+    "Brownie",
+    "Cural",
+    "FILE DE LINGUADO",
+    "GENGIBRE",
+    "MOLHO AMARELO",
+    "MOLHO VERDE",
+    "Queijo",
+    "Pizza",
+    "BRIGADEIRAO",
+    "Brownie ChocoBranco",
+    "Brownie Chocolate",
+    "Brownie Chocolate/Branco",
+    "Brownie Doce Leite",
+    "CONTRA FILE",
+    "GUIOZA BOVINO",
+    "GUIOZA SUINO",
+    "Torta Avela",
+    "Torta Banofe",
+    "Torta Maçã",
+    "Bomba de Chocolate",
+    "BOMBA DE CHOC",
+    "BROWNIE c/ Choc Branco",
+    "MOUSSE DE MARACUJÁ",
+    "CAROLINA",
+    "BROWNIE c/Avela",
+    "BROWNIE D.Leite",
+    "Batata Palito",
+    "BROWNIE de Chocolate Branco",
+    "caldo camarão/abóbora",
+    "CAMARÃO MOLHO",
+    "Carne de Yakisoba",
+    "CARNE MOIDA FRACIONADA",
+    "couve flor",
+    "Torta Ninho",
+    "Torta Morango",
+    "Mix Yakissoba",
+    "Banoffe",
     "Pao frances",
     "Pao de queijo",
     "Pao integral",
@@ -42,8 +1499,356 @@
     "Bolo simples",
     "Bolo recheado",
     "Salgados",
-    "Pizza",
     "Mousse",
-    "Pudim"
-  ]
+    "Morangos do amor",
+    "Morango cravejado",
+    "Abacaxi/coco"
+  ],
+  "categories": {
+    "Roticeria": [
+      "Pizza mussarela fatia",
+      "Pizza calabresa fatia",
+      "Pizza frango catupiry fatia",
+      "Salgados estufa 70C",
+      "Bolinho de carne congelado",
+      "Quibe congelado",
+      "Bolinha de queijo congelada",
+      "Risole congelado",
+      "Croquete congelado",
+      "Empada congelada",
+      "Esfiha congelada",
+      "Enroladinho de salsicha congelado",
+      "Quiche congelada",
+      "Quiche de brocolis com bacon",
+      "Coxinha",
+      "Bolinho de carne",
+      "Kibe",
+      "Quibe",
+      "Bolinho de pernil",
+      "Bolinha de queijo",
+      "Risole",
+      "Croquete",
+      "Empada",
+      "Esfiha",
+      "Enroladinho de salsicha",
+      "Pastel assado",
+      "quiche de brócolis brócolis com bacon",
+      "Queijo",
+      "Pizza"
+    ],
+    "Confeitaria": [
+      "Mousse morango",
+      "Mousse goiaba",
+      "Pudim",
+      "Mousse ninho",
+      "Creme de leite / ninho",
+      "Gelatina mosaica",
+      "Creme de abacaxi",
+      "Mousse abacaxi",
+      "Mousse amora",
+      "Mousse limao",
+      "Mousse abacaxi/coco",
+      "Mousse chocolate/creme",
+      "Torta maracuja",
+      "Pave argentina",
+      "Bolo",
+      "Brigadeiro",
+      "Mousse coco",
+      "Doce de leite",
+      "Chocolate c/ ninho",
+      "Mousse maracuja",
+      "Mousse abacaxi c/ coco",
+      "Mousse pudim",
+      "Mousse chocolate",
+      "Mousse manga",
+      "Mousse uva",
+      "Mousse pessego",
+      "Mousse cupuacu",
+      "Mousse acai",
+      "Mousse leite ninho",
+      "Mousse ninho c/ morango",
+      "Mousse nutella",
+      "Mousse oreo",
+      "Mousse doce de leite",
+      "Mousse pacoca",
+      "Mousse brigadeiro",
+      "Mousse beijinho",
+      "Mousse leite condensado",
+      "Mousse ameixa",
+      "Mousse goiabada",
+      "Mousse banana",
+      "Mousse banana c/ canela",
+      "Mousse kiwi",
+      "Mousse frutas vermelhas",
+      "Mousse cereja",
+      "Mousse framboesa",
+      "Mousse mirtilo",
+      "Mousse tangerina",
+      "Mousse laranja",
+      "Mousse melancia",
+      "Mousse melao",
+      "Mousse cafe",
+      "Mousse capuccino",
+      "Mousse caramelo",
+      "Mousse chocolate branco",
+      "Mousse choc. meio amargo",
+      "Mousse alpino",
+      "Mousse sonho de valsa",
+      "Mousse ouro branco",
+      "Mousse ovomaltine",
+      "Mousse churros",
+      "Mousse coco queimado",
+      "Mousse tapioca",
+      "Mousse baunilha",
+      "Mousse pistache",
+      "Mousse amendoim",
+      "Bolo chocolate",
+      "Torta Limao",
+      "Gelatina MOZAICO",
+      "Bolo de Cenoura",
+      "Torta argentina",
+      "Bolo Cenoura",
+      "Banofe",
+      "Mousse goiaba/frutas vermelhas",
+      "Bolo Ninho",
+      "Tentacao",
+      "Mousse ninho c/ avela",
+      "Mousse Tentacao",
+      "M/ maracuja",
+      "Avela",
+      "Torta de Avela",
+      "MOZAICO",
+      "MANJAR",
+      "Mous/ maracuja",
+      "Mous/ Pessego",
+      "Bolo brigadeiro",
+      "Bolo Nutela",
+      "chocolate branco",
+      "Pudim Chocolate",
+      "Torta goiaba",
+      "Torta Uva",
+      "Bolo Ninho Nutela",
+      "Bolo chocolate branco",
+      "Bolo Ninho Avela",
+      "Brownie",
+      "Cural",
+      "BRIGADEIRAO",
+      "Brownie ChocoBranco",
+      "Brownie Chocolate",
+      "Brownie Chocolate/Branco",
+      "Brownie Doce Leite",
+      "Torta Avela",
+      "Torta Banofe",
+      "Torta Maçã",
+      "Bomba de Chocolate",
+      "BOMBA DE CHOC",
+      "BROWNIE c/ Choc Branco",
+      "MOUSSE DE MARACUJÁ",
+      "CAROLINA",
+      "BROWNIE c/Avela",
+      "BROWNIE D.Leite",
+      "BROWNIE de Chocolate Branco",
+      "Torta Ninho",
+      "Torta Morango"
+    ],
+    "Cozinha": [
+      "Bife ancho",
+      "Mandioca",
+      "Berinjela",
+      "Carne de yakssoba",
+      "File mignon",
+      "Recheio de pastel carne",
+      "Recheio de pastel frango",
+      "Recheio de pastel camarao",
+      "Recheio de pastel palmito",
+      "Recheio de pastel calabresa",
+      "Recheio de pastel pizza",
+      "alho triturado",
+      "alho IZABEL",
+      "ARROZ DE POLVO",
+      "MACARRÃO TALHARIM",
+      "mussarela fatiada 50 und",
+      "CARNE YAKISOBA",
+      "CHORIZO CABANãS",
+      "Frango strogonoff",
+      "Frango Yakissoba",
+      "SALMAO",
+      "yakissoba",
+      "Bacon",
+      "RABO DE PORCO",
+      "calabresa",
+      "Calda maracujá",
+      "feijao",
+      "frango",
+      "molho camarao",
+      "molho maracuja",
+      "molho tomate",
+      "ORELHA DE PORCO",
+      "PE DE PORCO",
+      "pirao",
+      "purê abobora",
+      "purê batata",
+      "agrega",
+      "ancho",
+      "azeitona",
+      "Bacalhau",
+      "Bife Ancho 92",
+      "brocolis",
+      "carreteiro",
+      "vinagrete",
+      "ovo",
+      "Ketchup",
+      "mostarda",
+      "mussarela fatiada",
+      "mussarela ralada",
+      "talharim",
+      "tainha",
+      "polvo",
+      "congelado",
+      "SALSICHA",
+      "TOSCANA",
+      "TOICINHO",
+      "arroz brocolis",
+      "FRANGO PASSARINHO",
+      "PATINHO BOV",
+      "SALSISHA",
+      "OVO COZIDO",
+      "arroz carreteiro",
+      "Cevite",
+      "Doce Tapioca côco",
+      "CHORIZO 92",
+      "Yakisoba carne",
+      "mussarela 50 fatias",
+      "COSTELA",
+      "Bife milanesa",
+      "ancho 92",
+      "Carne Moida",
+      "FIle de frango",
+      "Filé Tainha",
+      "Frango a passarinho",
+      "Isca de frango",
+      "Molho de camarão",
+      "molho de maracujá",
+      "Arroz a Grega",
+      "Arroz Polvo",
+      "legumes",
+      "Molho Vermelho",
+      "Purê",
+      "mussarela",
+      "abobora",
+      "arroz cremoso",
+      "batata sote",
+      "belle",
+      "Bisteca",
+      "Bobó",
+      "camarao",
+      "coracao",
+      "couve",
+      "Feijoada",
+      "linguiça",
+      "Moqueca",
+      "Queijo 30F",
+      "Queijo 50F",
+      "Queijo pedaço",
+      "strogonoff camarao",
+      "strogonoff frango",
+      "Alcaparras",
+      "Alho",
+      "Carne",
+      "carne seca",
+      "cenoura",
+      "Champignon",
+      "coxa da asa",
+      "Coxa S Coxa",
+      "Frutos do Mar",
+      "Kafta",
+      "Linguado",
+      "Picanha",
+      "Margarina",
+      "Mignon",
+      "Misto",
+      "Tulipa",
+      "Costela salgada",
+      "Abacaxi",
+      "batata bacalhau",
+      "filé frango",
+      "almôndegas",
+      "Macarrao",
+      "CALDO CALABRESA",
+      "caldo camarão",
+      "caldo feijão",
+      "caldo quenga",
+      "caldo verde",
+      "LAGARTO",
+      "MAMINHA",
+      "CUPIM",
+      "ATUM",
+      "Isca de Cacao",
+      "MANJUBA",
+      "Presunto",
+      "TRILHA",
+      "CARNE YAKI",
+      "Hambúrguer",
+      "palmito",
+      "Dendê",
+      "Mandioquinha",
+      "FILE DE LINGUADO",
+      "GENGIBRE",
+      "MOLHO AMARELO",
+      "MOLHO VERDE",
+      "CONTRA FILE",
+      "GUIOZA BOVINO",
+      "GUIOZA SUINO",
+      "Batata Palito",
+      "caldo camarão/abóbora",
+      "CAMARÃO MOLHO",
+      "Carne de Yakisoba",
+      "CARNE MOIDA FRACIONADA",
+      "couve flor",
+      "Mix Yakissoba",
+      "Banoffe"
+    ],
+    "Salão": [
+      "Pimenta apos aberta",
+      "Azeite apos aberto",
+      "Fatia de pizza estufa 70C",
+      "Salgados congelados",
+      "Fatia de pizza congelada",
+      "Kibe congelado",
+      "Coxinha congelada",
+      "Risole carne seca 3 por R$10,00",
+      "Pastel Belém doce Refrigerado",
+      "Carne pimentao"
+    ],
+    "Bar": [
+      "Laranja Fatiada uso diario",
+      "Limao Fatiado uso diario",
+      "Limão fatiado",
+      "Limão Espremido uso diario",
+      "Limão uso diario",
+      "Marula maracujá Após aberto"
+    ]
+  },
+  "aliases": {
+    "arroz carrteiro": "arroz carreteiro",
+    "SAALSISHA": "SALSICHA",
+    "Risole carne 3 por R$10,00": "Risole carne seca 3 por R$10,00",
+    "cevit": "Cevite",
+    "Molhode camarão": "Molho de camarão",
+    "Purê de abóbora": "purê abobora",
+    "purê de batata": "purê batata",
+    "Championg": "Champignon",
+    "miong": "Mignon",
+    "Brocois": "brocolis",
+    "mosaica": "Gelatina MOZAICO",
+    "BRIGADEIRAAO": "BRIGADEIRAO",
+    "Boba Chocolate": "Bolo chocolate",
+    "TORTINHA LIMAO": "Torta Limao",
+    "TORTA LIMAOO": "Torta Limao",
+    "Boba de Chocolate": "Bomba de Chocolate",
+    "garoto de programa": "agrega",
+    "FEIJAOO": "feijao",
+    "PIRAOO": "pirao",
+    "Banoff": "Banoffe"
+  }
 }
